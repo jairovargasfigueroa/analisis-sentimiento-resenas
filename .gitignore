@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+*.egg-info/
+
+# Entorno
+.env
+!frontend/.env.example
+
+# Node / frontend
+node_modules/
+frontend/dist/
+
+# Datos pesados (si superan 50 MB, usar un script de descarga)
+data/raw/*.zip
+data/raw/*.parquet
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
