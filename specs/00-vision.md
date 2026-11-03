@@ -40,8 +40,8 @@ Lo define `specs/10-datos-eda.md`. Requisitos:
 | # | Integrante | Usuario GitHub | Área principal | Specs |
 |---|---|---|---|---|
 | 1 | Jairo Vargas Figueroa | @jairovargasfigueroa | Datos, EDA y NLP base | 10, 20 (parte A) |
-| 2 | _completar_ | _completar_ | Modelado y experimentos | 20 (parte B), 30 |
-| 3 | _completar_ | _completar_ | Backend, evaluación y tests | 30 (parte B), 40 |
-| 4 | _completar_ | _completar_ | Frontend y explicación del pipeline | 20 (parte C), 50 |
+| 2 | Brayan Albaro Garcia Taboada | @Alba-Tab | Modelado y experimentos | 20 (parte B), 30 (parte A) |
+| 3 | Jovas Josue | @JOVAS45 | Backend, evaluación y tests | 30 (parte B), 40 |
+| 4 | Adrian Rosales | @black7in | Frontend y explicación del pipeline | 20 (parte C), 50 |
 
 Todos participan en `60-entrega.md`. **Cada integrante tiene asignada al menos una parte de NLP o ML**, porque el docente preguntará a todos sobre ello.

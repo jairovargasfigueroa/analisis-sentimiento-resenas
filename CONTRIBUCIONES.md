@@ -11,7 +11,7 @@ Cada integrante completa **su propia sección** en su propio commit. Esta inform
 
 **Parte de NLP/ML:** _completar_
 
-## Integrante 2 · _Nombre_ (@usuario)
+## Integrante 2 · Brayan Albaro Garcia Taboada (@Alba-Tab)
 
 **Rol:** Modelado y experimentos · Specs 20 (parte B) y 30 (parte A)
 
@@ -19,7 +19,7 @@ Cada integrante completa **su propia sección** en su propio commit. Esta inform
 
 **Parte de NLP/ML:** _completar_
 
-## Integrante 3 · _Nombre_ (@usuario)
+## Integrante 3 · Jovas Josue (@JOVAS45)
 
 **Rol:** Backend, evaluación y tests · Specs 30 (parte B) y 40
 
@@ -27,7 +27,7 @@ Cada integrante completa **su propia sección** en su propio commit. Esta inform
 
 **Parte de NLP/ML:** _completar_
 
-## Integrante 4 · _Nombre_ (@usuario)
+## Integrante 4 · Adrian Rosales (@black7in)
 
 **Rol:** Frontend y explicación del pipeline · Specs 20 (parte C) y 50
 
