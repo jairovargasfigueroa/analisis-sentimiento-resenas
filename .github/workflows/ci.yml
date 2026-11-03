@@ -1,0 +1,62 @@
+# Se ejecuta en cada PR hacia main y en cada push a main.
+# Un PR solo debería integrarse con todos los checks en verde.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, edited, synchronize, reopened]
+  push:
+    branches: [main]
+
+jobs:
+  titulo-pr:
+    name: Título del PR con número de tarea
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verificar formato "[tarea] tipo(ámbito): descripción"
+        env:
+          TITULO: ${{ github.event.pull_request.title }}
+        run: |
+          echo "Título: $TITULO"
+          if ! echo "$TITULO" | grep -Eq '^\[[0-9]+(\.[0-9]+)?(-[A-Za-z]+)?\] (feat|fix|test|docs|refactor|exp|chore)(\([^)]+\))?: .+'; then
+            echo "::error::El título debe ser como: [1.3] feat(nlp): stop words con negaciones conservadas"
+            exit 1
+          fi
+
+  python:
+    name: Tests de Python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Instalar dependencias
+        run: |
+          pip install -r requirements.txt
+          python -m nltk.downloader stopwords
+      - name: pytest
+        # El código 5 significa "no hay tests todavía": no se considera fallo.
+        run: pytest -q || [ $? -eq 5 ]
+
+  frontend:
+    name: Build del frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Comprobar si existe el frontend
+        id: existe
+        run: echo "si=$([ -f frontend/package.json ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        if: steps.existe.outputs.si == 'true'
+        with:
+          node-version: "20"
+      - name: npm install y build
+        if: steps.existe.outputs.si == 'true'
+        working-directory: frontend
+        run: |
+          npm install
+          npm run build
