@@ -2,7 +2,7 @@
 
 ## Tarea del plan
 
-<!-- Número y nombre, según specs/04-plan-de-trabajo.md. Ejemplo: 1.3 · Stop words -->
+Closes #<!-- número del issue de la tarea: se cierra solo al integrar el PR -->
 
 ## Qué hace este PR
 

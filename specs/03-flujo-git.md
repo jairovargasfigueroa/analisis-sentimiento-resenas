@@ -13,6 +13,8 @@ cd analisis-sentimiento-resenas
 
 Comprueba que tus commits salgan con tu cuenta: el correo debe ser uno verificado en tu GitHub.
 
+Instala también **GitHub CLI** (`winget install GitHub.cli`) e inicia sesión con `gh auth login`. Con eso tú y tu agente pueden ver los issues asignados, abrir PR y aprobar revisiones desde la terminal.
+
 ## Ramas
 
 - `main` está **protegida**: nadie hace push directo, todo entra por pull request.
