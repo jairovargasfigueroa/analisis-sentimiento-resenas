@@ -2,6 +2,12 @@
 
 Este es el **mapa** del proyecto. Cada tarea es **una rama → uno o varios commits → un PR** que revisa otro integrante. Para saber *cómo* hacer cada tarea, ve a la spec que se indica.
 
+**Cómo se sabe qué está hecho:** una tarea está terminada cuando su rama ya se integró a `main`. Por eso:
+
+- La rama se llama **exactamente** como dice la tabla. En la fase 4 se usa `docs/<tarea>-<nombre>`, por ejemplo `docs/informe-jovas`.
+- El título del PR empieza con el número de la tarea: `[1.3] feat(nlp): stop words con negaciones conservadas`.
+- Para ver el estado: `git log origin/main --merges --oneline` o `gh pr list --state all`. El agente de IA lo revisa solo al iniciar cada sesión (ver `AGENTS.md`).
+
 **Equipo:** Jairo = P1 (datos y NLP) · Brayan = P2 (modelado) · Jovas = P3 (backend) · Adrián = P4 (frontend).
 
 ## Reglas para que nada choque

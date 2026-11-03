@@ -5,6 +5,45 @@ El enunciado original del docente está en `docs/enunciado-proyecto-integrador.p
 
 El proyecto se desarrolla **guiado por especificaciones**: todo lo que hay que construir está en `specs/`.
 
+## Al iniciar cada sesión (obligatorio, antes de cualquier otra cosa)
+
+Haz esto tú mismo, sin esperar a que el integrante lo pida:
+
+1. **Identifica al integrante** con `git config user.name`, `git config user.email` y, si está disponible, `gh api user --jq .login`. Búscalo en esta tabla:
+
+   | Integrante | Usuario GitHub | Rol |
+   |---|---|---|
+   | P1 · Jairo Vargas Figueroa | jairovargasfigueroa | Datos y NLP |
+   | P2 · Brayan Albaro Garcia Taboada | Alba-Tab | Modelado |
+   | P3 · Jovas Josue | JOVAS45 | Backend |
+   | P4 · Adrian Rosales | black7in | Frontend |
+
+   Si no coincide con nadie, o si Git no tiene su identidad configurada, **pregúntale quién es** y ayúdale a configurar `user.name` y `user.email` con su propia cuenta antes de seguir.
+2. **Trae lo último:** `git fetch origin` y `git switch main && git pull` (si hay cambios sin commitear en otra rama, primero haz commit o pregunta).
+3. **Averigua qué tareas ya están terminadas.** Una tarea está terminada cuando su rama ya se integró a `main`:
+   ```bash
+   git log origin/main --merges --oneline        # "Merge pull request #N from .../<rama>"
+   gh pr list --state all                         # si gh está disponible: abiertos y cerrados
+   ```
+   Compara las ramas integradas con las de `specs/04-plan-de-trabajo.md`.
+4. **Elige la siguiente tarea de ESE integrante**, siguiendo el orden de su fila en "Resumen por persona":
+   - Si tiene una rama de una tarea a medias (`git branch`, o un PR abierto suyo), continúa esa.
+   - Si no, toma la primera tarea suya que no esté integrada.
+   - Si esa tarea depende de algo que todavía **no está en `main`** (columna "Necesita"), no esperes: trabaja con el contrato de `02-contratos.md` y datos simulados, o adelanta la siguiente tarea suya que no dependa de nada.
+5. **Díselo al integrante** en dos o tres líneas, antes de tocar código: quién es, qué tareas suyas ya están integradas, cuál toca ahora (número, rama y spec) y de qué depende. Espera su confirmación.
+6. Crea la rama de esa tarea desde `main` actualizado, con **el nombre exacto que dice el plan**.
+
+## Al terminar una tarea
+
+1. Corre `pytest -q` (si hay tests) y verifica los criterios de aceptación de la spec.
+2. Actualiza la rama con `main` (`git merge origin/main`) y resuelve conflictos si los hay.
+3. `git push -u origin <rama>` y abre el PR con el título **`[<número de tarea>] <descripción>`**, por ejemplo `[1.3] feat(nlp): stop words con negaciones conservadas`.
+4. Dile al integrante **a quién debe pedirle la revisión** (tabla "Orden de revisión" del plan) y qué tarea sigue.
+
+## Cuando te toca revisar un PR
+
+Si el integrante te pide revisar un PR de un compañero: léelo contra su spec y contratos, pruébalo localmente (`gh pr checkout <N>` y luego `pytest -q`) y redacta comentarios concretos. **El integrante es quien aprueba e integra**, desde su propia cuenta. Se integra con "Create a merge commit".
+
 ## Antes de escribir código
 
 1. Lee, en este orden:
@@ -14,7 +53,7 @@ El proyecto se desarrolla **guiado por especificaciones**: todo lo que hay que c
    4. `specs/03-flujo-git.md`: cómo se trabaja con Git y GitHub.
    5. `specs/04-plan-de-trabajo.md`: qué tarea le toca al integrante y en qué orden.
    6. La spec del área en la que trabaja el integrante (`10-` a `60-`).
-2. Pregunta al integrante **en qué spec va a trabajar** si no lo dijo.
+2. Confirma que la tarea elegida en "Al iniciar cada sesión" es la que el integrante quiere hacer.
 3. Verifica que esté en su propia rama (`git branch --show-current`), nunca en `main`.
 4. Verifica que Git tenga **su** identidad: `git config user.name` y `git config user.email`.
 

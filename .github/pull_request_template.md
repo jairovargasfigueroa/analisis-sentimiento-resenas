@@ -1,3 +1,9 @@
+<!-- Título del PR: "[número de tarea] tipo(ámbito): descripción", p. ej. "[1.3] feat(nlp): stop words con negaciones conservadas" -->
+
+## Tarea del plan
+
+<!-- Número y nombre, según specs/04-plan-de-trabajo.md. Ejemplo: 1.3 · Stop words -->
+
 ## Qué hace este PR
 
 <!-- Resumen en 1–3 líneas -->
