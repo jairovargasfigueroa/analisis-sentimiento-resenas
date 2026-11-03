@@ -41,9 +41,9 @@ Aplicar en este orden y **justificar cada decisión en el informe**:
 ### Stop words: `obtener_stopwords()`, `quitar_stopwords(tokens)`
 
 - Base: `nltk.corpus.stopwords.words("spanish")`, **normalizada igual que el texto** (sin tildes).
-- **Quitar de la lista** (es decir, conservarlas): `no`, `ni`, `nunca`, `jamas`, `sin`, `nada`, `muy`, `poco`, `pero`. Justificar: niegan o intensifican el sentimiento.
-- **Agregar**, si la EDA lo justifica, palabras del dominio que no aportan (por ejemplo, `restaurante`, `hotel`, `comida`, si aparecen igual en ambas clases).
-- Dejar las listas `CONSERVAR` y `AGREGAR` como constantes al inicio del archivo. Esto facilita la **modificación en vivo** ("agregar o quitar una stop word").
+- **Quitar de la lista** (es decir, conservarlas) las palabras de `params.yaml → nlp.conservar`: negaciones e intensificadores (`no`, `nunca`, `sin`, `muy`, `pero`…). Justificar: niegan o intensifican el sentimiento.
+- **Agregar** las de `params.yaml → nlp.agregar`: palabras del dominio que no aportan, elegidas con la EDA (por ejemplo, `restaurante` u `hotel`, si aparecen igual en ambas clases).
+- Las listas se leen de `params.yaml` (vía `src/config.PARAMS`), **no se escriben fijas en el código**. Así la **modificación en vivo** ("agregar o quitar una stop word") es cambiar una línea y reentrenar.
 
 ### Transformer: `TextPreprocessor` (C4)
 
@@ -86,10 +86,10 @@ Aplicar en este orden y **justificar cada decisión en el informe**:
 
 ## TF-IDF (lo configura P2 en `train.py`)
 
-Parámetros documentados en `metricas.json` (C6) y en el informe:
+Los parámetros salen de `params.yaml → tfidf` y se documentan en `metricas.json` (C6) y en el informe:
 
-- `ngram_range`: se compara `(1,1)` contra `(1,2)` (experimento E2, spec 30).
-- `min_df=2` (descarta palabras que aparecen en un solo documento).
-- `max_df=0.9` (descarta palabras presentes en casi todo).
-- `max_features`: 20.000 o lo que justifique el tamaño del vocabulario.
-- `sublinear_tf=True`.
+- `ngram_range`: se compara `(1,1)` contra `(1,2)` (experimento E2, spec 30, `experiments.ngram_ranges`).
+- `min_df: 2` (descarta palabras que aparecen en un solo documento).
+- `max_df: 0.90` (descarta palabras presentes en casi todo).
+- `max_features: 20000`, o lo que justifique el tamaño del vocabulario.
+- `sublinear_tf: true`.

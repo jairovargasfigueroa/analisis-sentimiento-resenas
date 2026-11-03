@@ -5,7 +5,7 @@
 
 | Parte | Responsable | Rama sugerida | Archivos |
 |---|---|---|---|
-| A · Entrenamiento, ajuste y experimentos | Integrante 2 | `feat/modelos-train`, `exp/stem-vs-lema`, `exp/ngramas` | `src/models/train.py`, `src/models/experimentos.py`, `notebooks/02_experimentos.ipynb`, `requirements.txt` |
+| A · Entrenamiento, ajuste y experimentos | Integrante 2 | `feat/modelos-train`, `exp/experimentos` | `src/models/train.py`, `src/models/experimentos.py`, `notebooks/02_experimentos.ipynb`, secciones `tfidf` y `experiments` de `params.yaml` |
 | B · Evaluación, baseline y predicción | Integrante 3 | `feat/modelos-evaluacion` | `src/models/evaluacion.py`, `src/models/predecir.py`, `tests/test_modelo.py` |
 
 ---
@@ -31,6 +31,8 @@ Hace todo, sin pasos manuales:
 
 ### Modelos y grillas
 
+Las grillas se leen de `params.yaml → experiments.models`. **No se escriben fijas en el código**, para que "cambiar un hiperparámetro y reentrenar" sea editar una línea. Valores iniciales:
+
 | Modelo | Pipeline | Grilla mínima |
 |---|---|---|
 | Regresión Logística | `prep → tfidf → LogisticRegression(max_iter=1000, random_state=SEED)` | `clf__C: [0.1, 1, 10]`, `clf__class_weight: [None, "balanced"]` |
@@ -49,8 +51,9 @@ Hace todo, sin pasos manuales:
   - **Naive Bayes:** teorema de Bayes con independencia entre palabras; `alpha` es el suavizado de Laplace.
 
 ### Reproducibilidad
-- [ ] `requirements.txt` con versiones fijas (`==`).
+- [ ] Si se agrega una librería, se fija su versión en `requirements.txt` (`==`).
 - [ ] Dos ejecuciones seguidas de `train.py` dan **las mismas métricas**.
+- [ ] La decisión de qué modelo va a producción se toma con el **F1 macro de validación cruzada**, no con el de prueba: el de prueba solo se reporta.
 
 ---
 

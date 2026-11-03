@@ -6,18 +6,24 @@ Este archivo define **cómo se comunican las partes**. Gracias a él cada integr
 
 ---
 
-## C1 · Configuración (`src/config.py`), de P1
+## C1 · Configuración (`params.yaml` + `src/config.py`), ya creados
+
+`params.yaml` tiene todos los valores ajustables. `src/config.py` lo lee y expone:
 
 ```python
-SEED = 42
-ETIQUETAS = ["negativo", "positivo"]        # orden fijo: índice 0 y 1
-RUTA_DATOS_RAW = "data/raw/"
-RUTA_DATOS_PROCESADOS = "data/processed/resenas.csv"
-RUTA_MODELO = "models/modelo_produccion.joblib"
-RUTA_METRICAS = "models/metricas.json"
-LONGITUD_MAX_TEXTO = 5000                   # caracteres
-MAX_TEXTOS_LOTE = 100
+from src.config import (
+    PARAMS,                 # dict completo de params.yaml (nlp, tfidf, experiments, ...)
+    SEED,                   # 42
+    ETIQUETAS,              # ["negativo", "positivo"]  (orden fijo: índice 0 y 1)
+    RUTA_DATOS_RAW, RUTA_DATOS_PROCESADOS, TEST_SIZE,
+    RUTA_MODELO,            # models/modelo_produccion.joblib
+    RUTA_METRICAS,          # models/metricas.json
+    LONGITUD_MAX_TEXTO,     # 5000
+    MAX_TEXTOS_LOTE,        # 100
+)
 ```
+
+Las rutas son `pathlib.Path` absolutas, así que funcionan sin importar desde qué carpeta se ejecute. Todos los comandos se corren desde la **raíz del repo** con `python -m ...`.
 
 ## C2 · Dataset procesado (`data/processed/resenas.csv`), de P1
 

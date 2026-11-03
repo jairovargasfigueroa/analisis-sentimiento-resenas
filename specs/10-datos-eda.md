@@ -2,7 +2,7 @@
 
 - **Responsable:** Integrante 1 (Jairo)
 - **Ramas sugeridas:** `feat/datos-carga`, `exp/eda`
-- **Archivos:** `src/config.py`, `src/data/cargar.py`, `data/`, `notebooks/01_eda.ipynb`
+- **Archivos:** `src/data/cargar.py`, `data/`, `notebooks/01_eda.ipynb`, secciones `data`, `labels` y `nlp` de `params.yaml`
 - **Enunciado:** sección 4 (reglas del dataset) y sección 5.1
 
 ## Objetivo
@@ -13,6 +13,7 @@ Conseguir un dataset de reseñas en español, documentarlo, dejarlo limpio con e
 
 Criterios:
 
+- **Datos reales**, no sintéticos (el ejemplo del docente usa sintéticos y él aclara que los grupos deben usar reales).
 - En **español**.
 - **Al menos 1.000 reseñas** etiquetadas, o con estrellas. Lo ideal es tener entre 3.000 y 20.000 para que entrene rápido.
 - Licencia que permita uso académico.
@@ -61,13 +62,12 @@ Debe mostrar, con gráficos y una conclusión escrita en cada caso:
 
 ## Split
 
-El split lo **hace `train.py` (P2)**, no la EDA, para que sea reproducible. Se usa `train_test_split(test_size=0.2, stratify=y, random_state=SEED)`.
+El split lo **hace `train.py` (P2)**, no la EDA, para que sea reproducible. Se usa `train_test_split(test_size=TEST_SIZE, stratify=y, random_state=SEED)`.
 
 El conjunto de prueba **no se usa para ajustar nada**.
 
 ## Criterios de aceptación
 
-- [ ] `src/config.py` creado según C1.
 - [ ] `data/README.md` con origen, licencia, fecha y tamaño.
 - [ ] `data/processed/resenas.csv` cumple C2 y tiene al menos 1.000 filas.
 - [ ] `python -c "from src.data.cargar import cargar_procesado; print(cargar_procesado().shape)"` funciona.

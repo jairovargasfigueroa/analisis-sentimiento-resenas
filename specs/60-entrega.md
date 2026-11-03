@@ -9,6 +9,8 @@
 - [ ] Modelos serializados en `models/` **y** el script que los regenera con un solo comando.
 - [ ] Notebooks de EDA (`01_eda.ipynb`) y de experimentos (`02_experimentos.ipynb`), ejecutados y con las salidas visibles.
 - [ ] Informe técnico breve en `docs/informe.md`.
+- [ ] `docs/api.md` con los endpoints y ejemplos (P3).
+- [ ] `docs/modificaciones_en_vivo.md`: una receta **probada** por integrante, con los números antes y después.
 - [ ] `README.md` con instalación y ejecución **desde cero**.
 - [ ] `CONTRIBUCIONES.md` coherente con el historial de commits.
 - [ ] Diapositivas en `docs/presentacion.pdf`, o el enlace en el README.
@@ -17,13 +19,12 @@
 ## README.md (se va completando con PRs)
 
 1. Descripción del proyecto en dos o tres líneas.
-2. Requisitos: Python 3.11 y Node 18 o superior.
-3. Instalación:
+2. Requisitos: Python 3.12 y Node 18 o superior.
+3. Instalación (el modelo de spaCy ya viene en `requirements.txt`):
    ```bash
-   python -m venv .venv
-   .venv\Scripts\activate          # Windows  (Linux/Mac: source .venv/bin/activate)
+   py -3.12 -m venv .venv
+   .venv\Scripts\activate          # Windows  (Linux/Mac: python3.12 -m venv .venv && source .venv/bin/activate)
    pip install -r requirements.txt
-   python -m spacy download es_core_news_sm
    python -m nltk.downloader stopwords
    ```
 4. Entrenar: `python -m src.models.train`.
@@ -67,11 +68,13 @@ Debe **coincidir con el historial**. Se puede revisar con `git shortlog -sne` y 
 
 | Área | Ensayo | Dónde se toca |
 |---|---|---|
-| NLP | Agregar o quitar una stop word y reentrenar | `src/nlp/stopwords.py` (`CONSERVAR`/`AGREGAR`) |
-| NLP | Cambiar n-gramas o stem↔lema y reentrenar | `src/models/train.py` |
-| Modelado | Cambiar `C` o `alpha`, reentrenar y comparar | `src/models/train.py` |
+| NLP | Agregar o quitar una stop word y reentrenar | `params.yaml` → `nlp.conservar` / `nlp.agregar` |
+| NLP | Cambiar n-gramas o stem↔lema y reentrenar | `params.yaml` → `experiments.ngram_ranges` / `experiments.modos` |
+| Modelado | Cambiar `C` o `alpha`, reentrenar y comparar | `params.yaml` → `experiments.models` |
 | Modelado | Calcular otra métrica (por ejemplo, error por clase o AUC) | `src/models/evaluacion.py` |
 | Backend | Rechazar textos de menos de 3 palabras | `api/esquemas.py` |
 | Frontend | Mostrar un dato nuevo o cambiar un gráfico | `frontend/src/components/` |
+
+Cada receta probada se documenta en `docs/modificaciones_en_vivo.md`: qué se cambia, el comando para reentrenar, las métricas antes y después, y cómo interpretarlas.
 
 El día de la presentación se clona **desde el tag**: `git clone --branch entrega-final <url>`.
