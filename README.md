@@ -18,6 +18,7 @@ El desarrollo está **guiado por especificaciones**: todo lo que hay que constru
 | [01-arquitectura](specs/01-arquitectura.md) | Capas, stack, carpetas y responsables |
 | [02-contratos](specs/02-contratos.md) | Interfaces compartidas (funciones, artefactos, API) |
 | [03-flujo-git](specs/03-flujo-git.md) | Ramas, commits y pull requests |
+| [04-plan-de-trabajo](specs/04-plan-de-trabajo.md) | **Qué hace cada integrante y en qué orden** |
 | [10-datos-eda](specs/10-datos-eda.md) | Dataset y análisis exploratorio |
 | [20-nlp](specs/20-nlp.md) | Pipeline de preprocesamiento |
 | [30-modelos](specs/30-modelos.md) | Entrenamiento, comparación y evaluación |
@@ -31,12 +32,23 @@ Si usas un asistente de IA, este lee primero [`AGENTS.md`](AGENTS.md) (o `CLAUDE
 
 1. Acepta la invitación al repositorio.
 2. Configura tu identidad de Git y clona el repo (ver [03-flujo-git](specs/03-flujo-git.md)).
-3. Lee tu spec y crea tu rama: `git switch -c feat/<area>-<tarea>`.
-4. Trabaja con commits pequeños y abre un PR que revise otro integrante.
+3. Busca tu nombre en [04-plan-de-trabajo](specs/04-plan-de-trabajo.md): ahí están tus tareas en orden.
+4. Para cada tarea, crea su rama (`git switch -c feat/<area>-<tarea>`), haz commits pequeños y abre un PR que revise otro integrante.
 
-## Instalación y ejecución
+## Instalación
 
-> Se completa a medida que se integran las partes (ver [60-entrega](specs/60-entrega.md)).
+Requisitos: Python 3.12 y Node 18 o superior.
+
+```bash
+py -3.12 -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python -m nltk.downloader stopwords
+```
+
+Todos los comandos se ejecutan desde la raíz del repo. Los parámetros ajustables están en [`params.yaml`](params.yaml).
+
+> Entrenamiento, API y frontend: se completa a medida que se integran las partes (ver [60-entrega](specs/60-entrega.md)).
 
 ## Enunciado
 

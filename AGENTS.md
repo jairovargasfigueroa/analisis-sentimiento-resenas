@@ -12,7 +12,8 @@ El proyecto se desarrolla **guiado por especificaciones**: todo lo que hay que c
    2. `specs/01-arquitectura.md`: capas, carpetas y artefactos.
    3. `specs/02-contratos.md`: interfaces compartidas. **No se cambian sin acuerdo del equipo.**
    4. `specs/03-flujo-git.md`: cómo se trabaja con Git y GitHub.
-   5. La spec del área en la que trabaja el integrante (`10-` a `60-`).
+   5. `specs/04-plan-de-trabajo.md`: qué tarea le toca al integrante y en qué orden.
+   6. La spec del área en la que trabaja el integrante (`10-` a `60-`).
 2. Pregunta al integrante **en qué spec va a trabajar** si no lo dijo.
 3. Verifica que esté en su propia rama (`git branch --show-current`), nunca en `main`.
 4. Verifica que Git tenga **su** identidad: `git config user.name` y `git config user.email`.
@@ -23,7 +24,8 @@ El proyecto se desarrolla **guiado por especificaciones**: todo lo que hay que c
 - Haz cambios **pequeños**: un commit por idea, no un commit gigante al final.
 - Escribe código **simple y explicable**. El integrante debe poder explicar y modificar en vivo cada línea que suba; si no puede explicarla, ese commit no cuenta para su nota.
 - Después de cada cambio, explícale al integrante **qué hiciste, por qué y qué alternativas había**. Eso es lo que le van a preguntar en la defensa.
-- Usa semilla fija `SEED = 42` en todo lo aleatorio.
+- Usa semilla fija `SEED` (de `src/config.py`) en todo lo aleatorio.
+- Los parámetros ajustables (stop words, TF-IDF, grillas de hiperparámetros, límites de la API) se leen de `params.yaml` a través de `src/config.py`. **No los escribas fijos en el código.**
 - Si reutilizas código de documentación o de librerías, cita la fuente en un comentario.
 - Marca en la checklist de la spec (`- [x]`) lo que quede terminado.
 
@@ -36,6 +38,14 @@ El proyecto se desarrolla **guiado por especificaciones**: todo lo que hay que c
 - El autor del commit es **el integrante**, con su propia cuenta. No agregues líneas de coautoría de herramientas ni firmes como agente.
 - Si dos integrantes trabajaron juntos, agrega `Co-authored-by: Nombre <correo>` del **compañero**.
 - El uso de IA se declara una sola vez, en el informe técnico (`docs/informe.md`), como pide el enunciado.
+
+## Proyecto de ejemplo del docente
+
+El docente publicó un ejemplo del mismo tema: <https://github.com/kenjikv/opiniometro>. Sirve como **referencia de qué se espera** (nivel de detalle, documentación, tipo de pruebas), pero:
+
+- **No copies su código.** El enunciado (sección 10) considera plagio copiar un repositorio externo sin atribución, y cada integrante debe poder explicar lo que sube.
+- Si una idea concreta viene de ahí, **cítala** en un comentario y en el informe (por ejemplo: "idea de params.yaml tomada del ejemplo del docente").
+- Usamos **datos reales**, no sintéticos: el docente lo exige.
 
 ## Prohibido
 

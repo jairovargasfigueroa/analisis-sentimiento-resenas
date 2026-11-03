@@ -1,0 +1,32 @@
+# Versiones exactas (probadas con Python 3.12 en Windows).
+# El pipeline se serializa con joblib: entrenar y servir con las mismas versiones.
+
+# Datos y machine learning
+numpy==2.5.4
+pandas==3.1.0
+scikit-learn==1.9.1
+joblib==1.6.0
+
+# NLP
+nltk==3.10.4
+spacy==3.8.18
+es_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/es_core_news_sm-3.8.0/es_core_news_sm-3.8.0-py3-none-any.whl
+emoji==2.16.0
+
+# Configuración
+PyYAML==6.0.3
+
+# Backend
+fastapi==0.162.0
+uvicorn==0.54.0
+python-multipart==0.0.33
+
+# Tests
+pytest==9.2.0
+httpx==0.28.1
+
+# Notebooks (EDA y experimentos)
+jupyterlab==4.6.5
+ipykernel==7.4.0
+matplotlib==3.11.2
+seaborn==0.13.2

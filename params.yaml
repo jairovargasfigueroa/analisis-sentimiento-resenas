@@ -1,0 +1,47 @@
+# Fuente única de parámetros del proyecto.
+# Cambias un valor aquí, reentrenas (python -m src.models.train) y la API sirve el modelo nuevo.
+# Así se resuelven casi todas las modificaciones en vivo sin tocar código.
+#
+# Responsables de cada sección (cambios por PR):
+#   data, labels, nlp  -> Integrante 1
+#   tfidf, experiments -> Integrante 2
+#   api                -> Integrante 3
+
+seed: 42
+
+data:
+  raw_dir: data/raw/
+  processed_path: data/processed/resenas.csv
+  test_size: 0.20          # prueba estratificada; nunca se usa para ajustar nada
+
+labels: [negativo, positivo]   # orden fijo: índice 0 y 1
+
+nlp:
+  # Se QUITAN de la lista de stop words de NLTK porque cargan sentimiento
+  # ("no me gustó" sin "no" parece positivo). Escribirlas sin tildes.
+  # "no" va entre comillas: sin ellas YAML lo lee como el booleano false.
+  conservar: ["no", ni, nunca, jamas, sin, nada, tampoco, muy, poco, mucho, mas, menos, pero]
+  # Palabras del dominio que se AGREGAN como stop words (se completan según la EDA).
+  agregar: []
+
+tfidf:
+  max_features: 20000      # tamaño máximo del vocabulario
+  min_df: 2                # ignora términos en menos de 2 reseñas
+  max_df: 0.90             # ignora términos en más del 90 % de las reseñas
+  sublinear_tf: true       # 1 + log(tf)
+
+experiments:
+  cv_folds: 5
+  scoring: f1_macro
+  modos: [stem, lema]               # experimento E1
+  ngram_ranges: [[1, 1], [1, 2]]    # experimento E2
+  models:
+    regresion_logistica:
+      C: [0.1, 1.0, 10.0]
+      class_weight: [null, balanced]
+    naive_bayes:
+      alpha: [0.1, 0.5, 1.0]
+
+api:
+  max_chars: 5000          # textos más largos se rechazan (justificar con la EDA)
+  max_textos_lote: 100
