@@ -2,6 +2,15 @@
 
 Este es el **mapa** del proyecto. Cada tarea es **una rama → uno o varios commits → un PR** que revisa otro integrante. Para saber *cómo* hacer cada tarea, ve a la spec que se indica.
 
+## Seguimiento automático (GitHub Issues + CI)
+
+- **Cada tarea es un issue** del repo, asignado a su dueño, con su fase (milestone), su área (etiqueta), su rama, su spec y sus dependencias. Se ven en la pestaña *Issues*, filtrando por milestone o por persona.
+- La rama se llama **exactamente** como dice el issue.
+- El PR lleva el título `[1.3] feat(nlp): ...` y en la descripción `Closes #<issue>`. **Al integrarse, el issue se cierra solo**: un issue cerrado es una tarea terminada.
+- La **CI** (GitHub Actions) corre en cada PR. Verifica el formato del título, ejecuta `pytest` y compila el frontend. Solo se integra con todo en verde.
+- El agente de IA de cada integrante revisa sus issues al iniciar cada sesión y propone la siguiente tarea (ver `AGENTS.md`).
+- Cada uno lo ve con `gh issue list --assignee @me`, o en la web con *Issues → Assigned to me*.
+
 **Equipo:** Jairo = P1 (datos y NLP) · Brayan = P2 (modelado) · Jovas = P3 (backend) · Adrián = P4 (frontend).
 
 ## Reglas para que nada choque

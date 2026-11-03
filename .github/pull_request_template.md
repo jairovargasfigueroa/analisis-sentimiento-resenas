@@ -1,3 +1,9 @@
+<!-- Título del PR: "[número de tarea] tipo(ámbito): descripción", p. ej. "[1.3] feat(nlp): stop words con negaciones conservadas" -->
+
+## Tarea del plan
+
+Closes #<!-- número del issue de la tarea: se cierra solo al integrar el PR -->
+
 ## Qué hace este PR
 
 <!-- Resumen en 1–3 líneas -->
