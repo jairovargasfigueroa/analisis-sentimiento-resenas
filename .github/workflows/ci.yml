@@ -15,7 +15,7 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - name: Verificar formato "[tarea] tipo(ámbito): descripción"
+      - name: 'Verificar formato "[tarea] tipo(ámbito): descripción"'
         env:
           TITULO: ${{ github.event.pull_request.title }}
         run: |
