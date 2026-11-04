@@ -1,8 +1,6 @@
 import { useState } from "react";
 import Cabecera from "./components/Cabecera.jsx";
-
-// Pestaña provisional hasta que exista el formulario de análisis.
-const Analizar = () => <p>Próximamente: analizar una noticia.</p>;
+import Analizar from "./components/Analizar.jsx";
 
 // Para agregar una pestaña basta sumar una línea aquí.
 const PESTANAS = [
