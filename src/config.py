@@ -21,4 +21,5 @@ RUTA_MODELO = RUTA_MODELOS / "modelo_produccion.joblib"
 RUTA_METRICAS = RUTA_MODELOS / "metricas.json"
 
 LONGITUD_MAX_TEXTO = PARAMS["api"]["max_chars"]
+MIN_PALABRAS_TEXTO = PARAMS["api"]["min_palabras"]
 MAX_TEXTOS_LOTE = PARAMS["api"]["max_textos_lote"]
