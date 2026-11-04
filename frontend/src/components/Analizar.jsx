@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { predecir } from "../api.js";
 import { EJEMPLOS } from "../ejemplos.js";
+import PasoAPaso from "./PasoAPaso.jsx";
 import Resultado from "./Resultado.jsx";
 
 // Los mismos límites que params.yaml -> api (la API vuelve a validarlos).
@@ -57,6 +58,7 @@ export default function Analizar() {
         {error && <p className="error" role="alert">{error}</p>}
       </section>
       {resultado && <Resultado resultado={resultado} />}
+      {resultado && <PasoAPaso pasos={resultado.preprocesamiento} />}
     </>
   );
 }
