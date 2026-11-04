@@ -34,7 +34,7 @@ Cuidados (si no se hacen, las métricas salen absurdas):
 
 - La v2 trae los encabezados en mayúsculas (`CATEGORY`, `TOPICS`, …): se unifican los nombres de columna.
 - La etiqueta falsa viene como `Fake` en v1 y como `False` en v2. Se mapea a `falsa` / `verdadera` (`True` → `verdadera`).
-- `texto = Headline + ". " + Text`. Algunas noticias de la v2 no tienen titular: en ese caso, solo `Text`.
+- `texto = Headline + ". " + Text`. Algunas noticias de la v2 no tienen titular: en ese caso, solo `Text`. En la v1, el `Text` ya empieza con el titular (943 de 971): tampoco se repite.
 - `anio`: 2018 para v1; para v2 el año de la noticia (2020 o 2021) si se puede, si no 2021.
 - La columna `Source` se guarda como `fuente`, pero **no entra al modelo**: hay sitios satíricos (El Dizque, El Ruinaversal) que solo aparecen como falsos. Usarla sería hacer trampa.
 - Eliminar filas con texto vacío y **duplicados exactos**. Reportar cuántas se eliminaron.
