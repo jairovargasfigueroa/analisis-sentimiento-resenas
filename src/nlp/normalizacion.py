@@ -5,6 +5,8 @@ import unicodedata
 
 import emoji
 
+# La v1 del corpus anonimizó cifras, teléfonos y enlaces con marcadores; la v2 trae los reales.
+MARCADORES = {"*NUMBER*": " num ", "*PHONE*": " num ", "*URL*": " "}
 URL = re.compile(r"https?://\S+|www\.\S+")
 MENCION = re.compile(r"@\w+")
 HASHTAG = re.compile(r"#(\w+)")
@@ -22,7 +24,10 @@ def normalizar(texto: str) -> str:
         "¡¡URGENTE!! La OMS confirmó 3 casos 😱 https://x.com"
         -> "exclamacion urgente exclamacion la oms confirmó num casos emoji"
     """
-    t = URL.sub(" ", texto)
+    t = texto
+    for marcador, reemplazo in MARCADORES.items():
+        t = t.replace(marcador, reemplazo)
+    t = URL.sub(" ", t)
     t = MENCION.sub(" ", t)
     t = HASHTAG.sub(r" \1 ", t)
     # Exclamaciones y emojis se vuelven tokens: el tono sensacionalista puede ser señal.
