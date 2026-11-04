@@ -18,7 +18,7 @@ Dejar el corpus de noticias limpio con el formato C2 y hacer la EDA que pide el 
 | `train.xlsx` + `development.xlsx` (v1) | ene–jul 2018 | 971 | 491 / 480 | Política, Entretenimiento, Sociedad, Deporte, Ciencia |
 | `test.xlsx` (v2) | nov 2020–mar 2021 | 572 | 286 / 286 | COVID-19, Sociedad, Política |
 
-Columnas originales: `Id`, `Category`, `Topic`, `Source`, `Headline`, `Text`, `Link`. Mediana de unas 315 palabras en v1 y 400 en v2 (máximo 2.566). Incluye fuentes de varios países de habla hispana, también Bolivia.
+Columnas originales: `Id`, `Category`, `Topic`, `Source`, `Headline`, `Text`, `Link`. Mediana de unas 315 palabras en v1 y 400 en v2 (máximo 2.574 en v1 y 4.017 en v2; la más larga, con titular, tiene 25.872 caracteres). Incluye fuentes de varios países de habla hispana, también Bolivia.
 
 Documentar en `data/raw/README.md`: **nombre, URL, licencia, fecha de obtención, número de registros y columnas originales**.
 

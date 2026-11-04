@@ -41,6 +41,6 @@ experiments:
       alpha: [0.05, 0.1, 0.5, 1.0]
 
 api:
-  max_chars: 20000         # la noticia más larga del corpus tiene 2.566 palabras (~16.000 caracteres)
+  max_chars: 20000         # el 99,5 % de las noticias mide menos de 13.600 caracteres; solo 2 de 1.542 pasan de 20.000
   min_palabras: 20         # con menos palabras no hay base para decidir
   max_textos_lote: 100

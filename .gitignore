@@ -15,6 +15,9 @@ venv/
 node_modules/
 frontend/dist/
 
+# Datos generados (python -m src.data.cargar los regenera)
+data/processed/*.csv
+
 # Datos pesados (si superan 50 MB, usar un script de descarga)
 data/raw/*.zip
 data/raw/*.parquet
