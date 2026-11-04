@@ -38,14 +38,15 @@ def test_unifica_etiquetas_de_v1_y_v2():
         "category": ["Fake", "True", False, True],
         "topic": ["Política"] * 4,
         "source": ["El Dizque", None, "x", "y"],
-        "headline": ["Titular", "Otro", None, ""],
-        "text": ["Cuerpo uno", "Cuerpo dos", "Post sin titular", "Cuerpo cuatro"],
+        "headline": ["Titular", "Otro", None, "Repetido"],
+        "text": ["Cuerpo uno", "Cuerpo dos", "Post sin titular", "Repetido. Cuerpo cuatro"],
         "anio": [2018, 2018, 2021, 2021],
     })
     out = limpiar_y_etiquetar(crudo)
     assert list(out["etiqueta"]) == ["falsa", "verdadera", "falsa", "verdadera"]
     assert out["texto"][0] == "Titular. Cuerpo uno"
     assert out["texto"][2] == "Post sin titular"  # sin titular: solo el cuerpo
+    assert out["texto"][3] == "Repetido. Cuerpo cuatro"  # el cuerpo ya trae el titular: no se repite
     assert out["fuente"][1] == "desconocida"
 
 

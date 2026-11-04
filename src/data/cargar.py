@@ -33,11 +33,14 @@ def cargar_crudo() -> pd.DataFrame:
 def limpiar_y_etiquetar(df: pd.DataFrame) -> pd.DataFrame:
     """Devuelve las columnas del contrato C2: texto, etiqueta, tema, fuente, anio.
 
-    texto = titular + ". " + cuerpo; si no hay titular (72 noticias de la v2), solo el cuerpo.
+    texto = titular + ". " + cuerpo. Solo el cuerpo si no hay titular (72 noticias de la v2) o si
+    el cuerpo ya empieza con él (943 de las 971 de la v1): repetirlo solo en la v1 sería una pista
+    de la versión, no de la veracidad.
     """
     titular = df["headline"].fillna("").astype(str).str.strip()
     cuerpo = df["text"].fillna("").astype(str).str.strip()
-    texto = (titular + ". " + cuerpo).where(titular != "", cuerpo)
+    ya_incluido = pd.Series([c.startswith(t) for t, c in zip(titular, cuerpo)], index=df.index)
+    texto = (titular + ". " + cuerpo).where((titular != "") & ~ya_incluido, cuerpo)
 
     etiqueta = df["category"].astype(str).str.strip().str.lower().map(MAPA_ETIQUETAS)
     if etiqueta.isna().any():
