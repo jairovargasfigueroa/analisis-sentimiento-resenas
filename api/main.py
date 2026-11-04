@@ -10,9 +10,10 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from api.esquemas import ErrorAPI, Estado
+from api.esquemas import EntradaPrediccion, ErrorAPI, Estado, Prediccion
 from src.config import RUTA_METRICAS, RUTA_MODELO
-from src.models.predecir import cargar_modelo
+from src.models.predecir import cargar_modelo, predecir
+from src.nlp.explicar import explicar_preprocesamiento
 
 VERSION = "1.0.0"
 
@@ -46,6 +47,13 @@ async def manejar_formato_invalido(request: Request, exc: RequestValidationError
     return error("FORMATO_INVALIDO", "El cuerpo debe ser un JSON con el campo 'texto' (string).", 422)
 
 
+def modelo_o_503(request: Request):
+    if request.app.state.modelo is None:
+        raise ErrorAPI("MODELO_NO_DISPONIBLE",
+                       "No hay modelo entrenado. Ejecuta: python -m src.models.train", 503)
+    return request.app.state.modelo
+
+
 @app.get("/health", response_model=Estado, summary="Estado del servicio y del modelo",
          responses={503: {"description": "El modelo no cargó"}})
 def health(request: Request):
@@ -54,3 +62,15 @@ def health(request: Request):
     cuerpo = {"status": "ok" if cargado else "error", "modelo_cargado": cargado,
               "modelo": request.app.state.nombre_modelo, "version": VERSION}
     return JSONResponse(status_code=200 if cargado else 503, content=cuerpo)
+
+
+@app.post("/predict", response_model=Prediccion, summary="Clasificar una noticia",
+          responses={422: {"description": "JSON inválido"},
+                     503: {"description": "Modelo no disponible"}})
+def predict(entrada: EntradaPrediccion, request: Request):
+    """Devuelve falsa/verdadera, la probabilidad de cada clase y el preprocesamiento paso a paso."""
+    texto = entrada.texto
+    modelo = modelo_o_503(request)
+    resultado = predecir(modelo, [texto])[0]
+    return {**resultado, "modelo": request.app.state.nombre_modelo,
+            "preprocesamiento": explicar_preprocesamiento(texto, modelo.named_steps["prep"].modo)}
