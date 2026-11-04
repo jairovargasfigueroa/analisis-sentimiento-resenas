@@ -149,17 +149,62 @@ _(Jairo, PR 3.3.)_
 
 ## 7. Arquitectura, API y frontend
 
-_(Brayan, pendiente.)_
+```
+ENTRENAMIENTO · python -m src.models.train
+data/raw/*.xlsx → cargar.py → noticias.csv → split 80/20 (SEED=42)
+                                   │
+          Pipeline([prep: TextPreprocessor, tfidf: TfidfVectorizer, clf: LogisticRegression])
+                                   ▼
+               models/modelo_produccion.joblib + models/metricas.json
+
+USO · cada consulta
+frontend (React, :5173) ──JSON──► API (FastAPI, :8000) ──joblib.load al iniciar──► predict_proba
+                         ◄── clase, probabilidades y preprocesamiento paso a paso ──┘
+```
+
+### API (`api/`)
+
+| Endpoint | Qué devuelve |
+|---|---|
+| `GET /health` | Estado, si el modelo cargó y su nombre (503 si no hay modelo) |
+| `POST /predict` | `falsa`/`verdadera`, la probabilidad de cada clase y el preprocesamiento paso a paso |
+| `GET /metrics` | `metricas.json` completo (Jairo, PR 2.3) |
+
+- **FastAPI** porque valida las entradas con Pydantic y genera la documentación sola en `/docs`.
+- El modelo se carga **una vez** al iniciar (`lifespan`). Si no existe, la API arranca igual y responde 503 en vez de caerse.
+- **No reimplementa el preprocesamiento**: predice con el Pipeline cargado y el paso a paso sale de `explicar_preprocesamiento()`, que usa la misma función que `TextPreprocessor`.
+- **Validaciones** con un formato de error único `{"error": {"codigo", "mensaje"}}`: `TEXTO_VACIO`, `TEXTO_DEMASIADO_CORTO` (menos de 20 palabras: con menos no hay base para decidir), `TEXTO_DEMASIADO_LARGO` (más de 20.000 caracteres), `FORMATO_INVALIDO` y `MODELO_NO_DISPONIBLE`. Los límites salen de `params.yaml`.
+- CORS habilitado solo para el frontend.
+- Endpoints y ejemplos `curl` en `docs/api.md`. Cada código de error tiene su test.
+
+### Frontend (`frontend/`)
+
+React + Vite, con versiones fijas. Se tomó del ejemplo del docente (Opiniómetro) la **estructura** de pestañas y el indicador de estado, no su código.
+
+- **Cabecera**: punto verde o rojo según `GET /health`, consultado cada 10 s.
+- **Analizar**: caja de texto con contador, 4 noticias de ejemplo del conjunto de prueba (una falsa y una verdadera de cada época), resultado con su probabilidad y el **paso a paso**: original → normalizado → tokens con las stop words tachadas → sin stop words → lemas → entrada a TF-IDF.
+- **Métricas**: Jairo, PR 2.3.
+- El frontend no tiene lógica de NLP: solo muestra lo que devuelve la API. Todas las llamadas HTTP están en `src/api.js`.
 
 ## 8. Conclusiones y limitaciones
 
-_(Brayan, pendiente.)_
+_(Se completa con Jairo cuando estén los resultados del 2.2.)_
+
+Desde la parte de datos y NLP:
+
+- **El modelo aprende estilo, no veracidad.** Las señales que más ayudan (exclamaciones, tono, temas) son de forma. Una noticia falsa bien escrita o una verdadera alarmista lo engañan.
+- **Las diferencias de formato entre versiones del corpus contaminan el modelo** si no se igualan. Dos de ellas valían un punto de F1.
+- **Pocos datos** (1.542 noticias): por eso modelos lineales y validación cruzada, no modelos más complejos.
 
 ## 9. Declaración de uso de asistentes de IA
 
-_(Brayan, pendiente.)_
+**Brayan:** usé Claude (Anthropic), a través de Claude Code, como asistente durante todo el desarrollo de la Parte 1 (datos, pipeline de NLP, modelo base, API, frontend y README) y de esta documentación. Me ayudó a redactar código, tests, specs, mensajes de commit y estos textos, y a revisar el corpus. Por ejemplo, señaló el titular repetido y los marcadores `*NUMBER*` de la v1. Revisé cada cambio, corrí los tests y ensayé las modificaciones en vivo con los números que figuran en `docs/modificaciones_en_vivo.md`. Las decisiones de diseño y su justificación están en este informe y en los mensajes de commit, y puedo explicarlas.
+
+**Jairo:** _(PR 3.3.)_
 
 ## 10. Referencias
 
-_(Brayan, pendiente.)_
-
+- Posadas-Durán, J. P., Gómez-Adorno, H., Sidorov, G., & Escobar, J. J. M. (2019). Detection of fake news in a new corpus for the Spanish language. *Journal of Intelligent & Fuzzy Systems*, 36(5), 4869-4876.
+- Gómez-Adorno, H., Posadas-Durán, J. P., Enguix, G. B., & Capetillo, C. P. (2021). Overview of FakeDeS at IberLEF 2021: Fake News Detection in Spanish Shared Task. *Procesamiento del Lenguaje Natural*, 67, 223-231.
+- Librerías: scikit-learn, NLTK, spaCy (`es_core_news_sm`), FastAPI, React, Vite.
+- Ejemplo del docente: [Opiniómetro](https://github.com/kenjikv/opiniometro) (estructura de pestañas e idea de `params.yaml`).
