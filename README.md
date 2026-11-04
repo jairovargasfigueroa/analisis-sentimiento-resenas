@@ -1,6 +1,6 @@
-# Analizador de Sentimiento de Reseñas
+# Detector de Noticias Falsas en Español
 
-Aplicación web que clasifica reseñas en español como **positivas o negativas**, con su probabilidad, y muestra paso a paso el preprocesamiento de NLP aplicado.
+Aplicación web que clasifica noticias en español como **falsas o verdaderas**, con su probabilidad, y muestra paso a paso el preprocesamiento de NLP aplicado. Se entrena con *The Spanish Fake News Corpus* (1.543 noticias reales, CC BY 4.0).
 
 Proyecto Integrador · Primer Parcial · *Tópicos y Programación Avanzada*.
 
@@ -18,7 +18,7 @@ El desarrollo está **guiado por especificaciones**: todo lo que hay que constru
 | [01-arquitectura](specs/01-arquitectura.md) | Capas, stack, carpetas y responsables |
 | [02-contratos](specs/02-contratos.md) | Interfaces compartidas (funciones, artefactos, API) |
 | [03-flujo-git](specs/03-flujo-git.md) | Ramas, commits y pull requests |
-| [04-plan-de-trabajo](specs/04-plan-de-trabajo.md) | **Qué hace cada integrante y en qué orden** |
+| [04-plan-de-trabajo](specs/04-plan-de-trabajo.md) | **Qué hace cada integrante y en qué orden** (Brayan: Predicción · Jairo: Análisis y métricas) |
 | [10-datos-eda](specs/10-datos-eda.md) | Dataset y análisis exploratorio |
 | [20-nlp](specs/20-nlp.md) | Pipeline de preprocesamiento |
 | [30-modelos](specs/30-modelos.md) | Entrenamiento, comparación y evaluación |
@@ -33,15 +33,26 @@ Si usas un asistente de IA, este lee primero [`AGENTS.md`](AGENTS.md) (o `CLAUDE
 1. Acepta la invitación al repositorio.
 2. Configura tu identidad de Git y clona el repo (ver [03-flujo-git](specs/03-flujo-git.md)).
 3. Busca tu nombre en [04-plan-de-trabajo](specs/04-plan-de-trabajo.md): ahí están tus tareas en orden.
-4. Para cada tarea, crea su rama (`git switch -c feat/<area>-<tarea>`), haz commits pequeños y abre un PR que revise otro integrante.
+4. Para cada tarea, crea la rama que dice su issue, haz commits pequeños y abre un PR que revise el otro integrante.
 
 ## Instalación
 
 Requisitos: Python 3.12 y Node 18 o superior.
 
+Windows:
+
 ```bash
 py -3.12 -m venv .venv
 .venv\Scripts\activate
+pip install -r requirements.txt
+python -m nltk.downloader stopwords
+```
+
+macOS:
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 python -m nltk.downloader stopwords
 ```

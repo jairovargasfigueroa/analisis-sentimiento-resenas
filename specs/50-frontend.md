@@ -1,7 +1,8 @@
 # 50 · Frontend
 
-- **Responsable:** Integrante 4
-- **Ramas sugeridas:** `feat/front-base`, `feat/front-prediccion`, `feat/front-pasos`, `feat/front-lote`, `feat/front-metricas`
+- **Responsables:** Brayan (base, Analizar y paso a paso, PR 1.5; Lote, PR 3.1) y Jairo (Métricas, PR 2.3)
+- **Ramas:** `feat/front-analizar`, `feat/prediccion-lote`, `feat/metricas`
+- **Referencia:** las pestañas del ejemplo del docente (Opiniómetro). Se copia la estructura, no el código; cualquier idea tomada se cita en un comentario y en el informe.
 - **Archivos:** todo dentro de `frontend/`
 - **Enunciado:** sección 5.6. Consume el contrato **C8**.
 
@@ -19,10 +20,10 @@ Crear `src/mocks/` con las respuestas de ejemplo de C8 (predict, lote, metrics) 
 
 ## Vistas y componentes
 
-### 1. Analizar una reseña
-- [ ] Área de texto con un contador de caracteres (límite de 5.000) y un botón "Analizar".
-- [ ] Botones con **reseñas de ejemplo** (una positiva, una negativa, una con negación, una irónica). Sirven para la demo.
-- [ ] Resultado: la **clase** con color (verde o rojo) y la **probabilidad** como barra o medidor (por ejemplo, "Positivo · 94 %").
+### 1. Analizar una noticia
+- [ ] Área de texto con un contador de palabras y caracteres (mínimo 20 palabras, máximo 20.000 caracteres) y un botón "Analizar".
+- [ ] Botones con **noticias de ejemplo**: 2 falsas y 2 verdaderas tomadas del test. Sirven para la demo.
+- [ ] Resultado: la **clase** con color (rojo o verde) y la **probabilidad** como barra o medidor (por ejemplo, "Falsa · 94 %").
 - [ ] Estado de carga mientras espera y **mensaje de error claro** usando `error.mensaje` de la API.
 
 ### 2. Preprocesamiento paso a paso (exigido por el docente)
@@ -34,9 +35,11 @@ Con el campo `preprocesamiento` (C5), mostrar en orden:
 - [ ] Texto final que entra a TF-IDF.
 
 ### 3. Análisis por lote
-- [ ] Subir un `.txt` (una reseña por línea) o un `.csv` (columna `texto`), leído en el navegador.
-- [ ] Tabla de resultados (texto, clase, probabilidad) y un gráfico de resumen (positivas vs negativas).
-- [ ] Validar en el cliente: archivo vacío o más de 100 reseñas.
+Opcional (PR 3.1).
+
+- [ ] Subir un `.txt` (una noticia por línea) o un `.csv` (columna `texto`), leído en el navegador.
+- [ ] Tabla de resultados (texto, clase, probabilidad) y un resumen (falsas vs verdaderas).
+- [ ] Validar en el cliente: archivo vacío o más de 100 noticias.
 
 ### 4. Panel de métricas
 Con `GET /metrics` (C6):
@@ -44,7 +47,10 @@ Con `GET /metrics` (C6):
 - [ ] **Tabla comparativa** baseline vs Regresión Logística vs Naive Bayes (accuracy, precision, recall, F1).
 - [ ] **Gráfico de barras** comparando el F1 de los tres.
 - [ ] **Matriz de confusión** del modelo en producción (tabla de 2×2 coloreada).
-- [ ] Resultados de los experimentos E1 (stem vs lema) y E2 (n-gramas).
+- [ ] Resultados de los experimentos E1 (stem vs lema), E2 (n-gramas) y E3 si se hizo.
+- [ ] Errores con mayor confianza.
+
+Se deja fuera el Historial con base de datos del ejemplo: no lo pide el enunciado.
 
 ### 5. Indicador de estado
 - [ ] Un punto verde o rojo en la cabecera según `GET /health`.
@@ -53,6 +59,6 @@ Con `GET /metrics` (C6):
 
 ## Criterios de aceptación
 - [ ] `npm install && npm run dev` levanta en http://localhost:5173.
-- [ ] Las cinco vistas funcionan contra la API real.
+- [ ] Las vistas funcionan contra la API real.
 - [ ] Ninguna lógica de NLP o ML en el frontend: solo muestra lo que devuelve la API.
 - [ ] `frontend/README.md` breve, con los comandos.

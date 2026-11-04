@@ -1,7 +1,7 @@
 # 40 · Backend (API REST)
 
-- **Responsable:** Integrante 3
-- **Ramas sugeridas:** `feat/api-base`, `feat/api-predict`, `feat/api-validaciones`, `test/api`
+- **Responsables:** Brayan (`/health`, `/predict`, PR 1.4; `/predict/lote`, PR 3.1) y Jairo (`/metrics`, PR 2.3)
+- **Ramas:** `feat/api-prediccion`, `feat/prediccion-lote`, `feat/metricas`
 - **Archivos:** `api/main.py`, `api/esquemas.py`, `tests/test_api.py`
 - **Enunciado:** sección 5.5. Contrato: **C8** de `02-contratos.md`.
 
@@ -29,20 +29,21 @@ Para no bloquearse, se puede entrenar un modelo de prueba pequeño con datos inv
 | Método | Ruta | Descripción |
 |---|---|---|
 | GET | `/health` | Estado del servicio y del modelo |
-| POST | `/predict` | Una reseña → clase, probabilidad y preprocesamiento |
-| POST | `/predict/lote` | Varias reseñas → resultados y resumen |
+| POST | `/predict` | Una noticia → clase, probabilidad y preprocesamiento |
+| POST | `/predict/lote` | Varias noticias → resultados y resumen |
 | GET | `/metrics` | Contenido de `models/metricas.json` |
 
 ## Validaciones (con el formato de error de C8)
 
 - [ ] Texto vacío o solo espacios → `TEXTO_VACIO`.
-- [ ] Más de `LONGITUD_MAX_TEXTO` caracteres → `TEXTO_DEMASIADO_LARGO`.
+- [ ] Menos de `MIN_PALABRAS_TEXTO` palabras → `TEXTO_DEMASIADO_CORTO`.
+- [ ] Más de `LONGITUD_MAX_TEXTO` caracteres → `TEXTO_DEMASIADO_LARGO` (20.000: la noticia más larga del corpus tiene 2.566 palabras; se justifica con la EDA).
 - [ ] JSON mal formado, campo faltante o tipo incorrecto → `FORMATO_INVALIDO`. Se sobrescribe el manejador de `RequestValidationError` para usar el formato propio.
 - [ ] Lote vacío o mayor a `MAX_TEXTOS_LOTE` → `LOTE_INVALIDO`.
 
 Los mensajes de error deben ser **claros y en español**.
 
-> Posible modificación en vivo: "rechazar textos de menos de 3 palabras". Deja las validaciones en una función o en un validador de Pydantic fácil de extender.
+> Las validaciones van en una función o en un validador de Pydantic fácil de extender: una modificación en vivo puede ser cambiar el mínimo de palabras.
 
 ## Documentación
 
@@ -52,7 +53,8 @@ Los mensajes de error deben ser **claros y en español**.
 ## Tests (`tests/test_api.py`, con `TestClient`)
 
 - [ ] `/health` → 200 y `modelo_cargado: true`.
-- [ ] `/predict` con una reseña positiva → 200, con todas las claves de C8.
+- [ ] `/predict` con una noticia válida → 200, con todas las claves de C8.
+- [ ] `/predict` con menos de 20 palabras → 422 `TEXTO_DEMASIADO_CORTO`.
 - [ ] `/predict` con texto vacío → 422 `TEXTO_VACIO`.
 - [ ] `/predict` con texto demasiado largo → 422 `TEXTO_DEMASIADO_LARGO`.
 - [ ] `/predict` sin el campo `texto` → 422 `FORMATO_INVALIDO`.
