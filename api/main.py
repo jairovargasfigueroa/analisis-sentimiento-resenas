@@ -8,9 +8,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from api.esquemas import EntradaPrediccion, ErrorAPI, Estado, Prediccion
+from api.esquemas import EntradaPrediccion, ErrorAPI, Estado, Prediccion, validar_texto
 from src.config import RUTA_METRICAS, RUTA_MODELO
 from src.models.predecir import cargar_modelo, predecir
 from src.nlp.explicar import explicar_preprocesamiento
@@ -30,6 +31,12 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Detector de Noticias Falsas", version=VERSION, lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def error(codigo: str, mensaje: str, status: int) -> JSONResponse:
@@ -65,11 +72,11 @@ def health(request: Request):
 
 
 @app.post("/predict", response_model=Prediccion, summary="Clasificar una noticia",
-          responses={422: {"description": "JSON inválido"},
+          responses={422: {"description": "Texto vacío, corto, largo o JSON inválido"},
                      503: {"description": "Modelo no disponible"}})
 def predict(entrada: EntradaPrediccion, request: Request):
     """Devuelve falsa/verdadera, la probabilidad de cada clase y el preprocesamiento paso a paso."""
-    texto = entrada.texto
+    texto = validar_texto(entrada.texto)
     modelo = modelo_o_503(request)
     resultado = predecir(modelo, [texto])[0]
     return {**resultado, "modelo": request.app.state.nombre_modelo,

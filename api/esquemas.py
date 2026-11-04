@@ -2,6 +2,8 @@
 
 from pydantic import BaseModel, Field
 
+from src.config import LONGITUD_MAX_TEXTO, MIN_PALABRAS_TEXTO
+
 EJEMPLO = (
     "El Ministerio de Salud informó este lunes que la campaña de vacunación contra la "
     "influenza comenzará la próxima semana en todos los centros de salud del país, "
@@ -14,6 +16,19 @@ class ErrorAPI(Exception):
 
     def __init__(self, codigo: str, mensaje: str, status: int = 422):
         self.codigo, self.mensaje, self.status = codigo, mensaje, status
+
+
+def validar_texto(texto: str) -> str:
+    """Rechaza textos vacíos, demasiado cortos o demasiado largos. Fácil de extender en vivo."""
+    if not texto.strip():
+        raise ErrorAPI("TEXTO_VACIO", "El texto no puede estar vacío.")
+    if len(texto.split()) < MIN_PALABRAS_TEXTO:
+        raise ErrorAPI("TEXTO_DEMASIADO_CORTO",
+                       f"La noticia debe tener al menos {MIN_PALABRAS_TEXTO} palabras.")
+    if len(texto) > LONGITUD_MAX_TEXTO:
+        raise ErrorAPI("TEXTO_DEMASIADO_LARGO",
+                       f"La noticia no puede superar los {LONGITUD_MAX_TEXTO} caracteres.")
+    return texto
 
 
 class EntradaPrediccion(BaseModel):
