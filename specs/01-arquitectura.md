@@ -8,7 +8,7 @@ Por eso el preprocesamiento, TF-IDF y el modelo se empaquetan en **un solo `skle
 
 ```
 ENTRENAMIENTO  ·  python -m src.models.train
-data/raw/*.csv ─► carga y limpieza ─► split estratificado (SEED=42)
+data/raw/*.xlsx ─► carga y unificación ─► split estratificado (SEED=42)
                                          │
                        Pipeline([ ("prep",  TextPreprocessor),   ◄ src/nlp
                                   ("tfidf", TfidfVectorizer),
@@ -40,43 +40,42 @@ frontend (React) ──HTTP/JSON──► api (FastAPI) ──joblib.load──�
 ```
 analisis-sentimiento-resenas/
 ├── data/
-│   ├── raw/                 # dataset original (o script de descarga si pesa)  → P1
-│   └── processed/           # dataset limpio y etiquetado                        → P1
+│   ├── raw/                 # corpus original (.xlsx) y su README                → Brayan
+│   └── processed/           # noticias.csv (C2)                                  → Brayan
 ├── notebooks/
-│   ├── 01_eda.ipynb                                                              → P1
-│   └── 02_experimentos.ipynb                                                     → P2
+│   └── 01_eda.ipynb         # EDA, experimentos y análisis de errores            → Jairo
 ├── src/
-│   ├── config.py            # lee params.yaml: SEED, rutas, etiquetas (ya creado) → P1
+│   ├── config.py            # lee params.yaml: SEED, rutas, etiquetas            → Brayan
 │   ├── data/
-│   │   └── cargar.py        # carga, limpieza y etiquetado del dataset           → P1
+│   │   └── cargar.py        # carga y unificación del corpus                     → Brayan
 │   ├── nlp/
-│   │   ├── normalizacion.py # normalizar()                                       → P1
-│   │   ├── tokenizacion.py  # tokenizar()                                        → P1
-│   │   ├── stopwords.py     # obtener_stopwords(), quitar_stopwords()            → P1
-│   │   ├── raices.py        # stemizar(), lematizar()                            → P2
-│   │   ├── preprocesador.py # TextPreprocessor (transformer de sklearn)          → P1
-│   │   └── explicar.py      # explicar_preprocesamiento()                        → P4
+│   │   ├── normalizacion.py # normalizar(), quitar_tildes()                      → Brayan
+│   │   ├── tokenizacion.py  # tokenizar()                                        → Brayan
+│   │   ├── stopwords.py     # obtener_stopwords(), quitar_stopwords()            → Brayan
+│   │   ├── raices.py        # stemizar(), lematizar()                            → Brayan
+│   │   ├── preprocesador.py # TextPreprocessor (transformer de sklearn)          → Brayan
+│   │   └── explicar.py      # explicar_preprocesamiento()                        → Brayan
 │   └── models/
-│       ├── train.py         # comando único de entrenamiento                     → P2
-│       ├── experimentos.py  # stem vs lema, uni vs uni+bi                        → P2
-│       ├── evaluacion.py    # métricas, baseline, matriz de confusión, errores   → P3
-│       └── predecir.py      # cargar_modelo(), predecir()                        → P3
+│       ├── train.py         # comando único de entrenamiento                     → Brayan (base), Jairo (comparación)
+│       ├── experimentos.py  # E1 stem vs lema, E2 n-gramas, E3 temporal          → Jairo
+│       ├── evaluacion.py    # métricas, baseline, matriz de confusión, errores   → Jairo
+│       └── predecir.py      # cargar_modelo(), predecir()                        → Brayan
 ├── models/                  # artefactos generados: .joblib y metricas.json
 ├── api/
-│   ├── main.py              # app FastAPI                                        → P3
-│   └── esquemas.py          # modelos Pydantic de request/response               → P3
-├── frontend/                # app React + Vite                                   → P4
-├── tests/                   # test_nlp.py (P1/P2), test_api.py (P3), test_modelo.py (P3)
+│   ├── main.py              # app FastAPI (/health, /predict, /predict/lote)     → Brayan; /metrics → Jairo
+│   └── esquemas.py          # modelos Pydantic de request/response               → Brayan
+├── frontend/                # React + Vite: Analizar y Lote → Brayan; Métricas → Jairo
+├── tests/                   # test_datos, test_nlp, test_modelo, test_api        → el dueño de cada parte
 ├── docs/
-│   ├── informe.md           # informe técnico                                    → todos
-│   ├── api.md               # endpoints con ejemplos curl                        → P3
-│   ├── modificaciones_en_vivo.md  # recetas probadas para la defensa             → todos
+│   ├── informe.md           # informe técnico                                    → los dos (cada uno su sección)
+│   ├── api.md               # endpoints con ejemplos curl                        → Brayan
+│   ├── modificaciones_en_vivo.md  # recetas probadas para la defensa             → los dos
 │   └── enunciado-proyecto-integrador.pdf
 ├── specs/                   # estas especificaciones
 ├── params.yaml              # todos los parámetros ajustables                    → por sección (ver el archivo)
-├── requirements.txt         # dependencias con versión fija (ya creado)          → compartido, cambios por PR
-├── README.md                                                                     → todos
-└── CONTRIBUCIONES.md                                                             → todos
+├── requirements.txt         # dependencias con versión fija                      → compartido, cambios por PR
+├── README.md                                                                     → Brayan
+└── CONTRIBUCIONES.md                                                             → los dos (cada uno su sección)
 ```
 
 ## Reproducibilidad

@@ -2,35 +2,19 @@
 
 Cada integrante completa **su propia sección** en su propio commit. Esta información debe coincidir con el historial de Git (`git shortlog -sne`).
 
-## Integrante 1 · Jairo Vargas Figueroa (@jairovargasfigueroa)
+## Brayan Albaro Garcia Taboada (@Alba-Tab)
 
-**Rol:** Datos, EDA y NLP base · Specs 10 y 20 (parte A)
+**Parte 1 · Predicción** · Specs 10 (carga), 20, 30 (base), 40, 50 (Analizar)
 
-- Organización del repositorio y especificaciones del proyecto (`specs/`, `AGENTS.md`).
-- _completar con enlaces a PR_
-
-**Parte de NLP/ML:** _completar_
-
-## Integrante 2 · Brayan Albaro Garcia Taboada (@Alba-Tab)
-
-**Rol:** Modelado y experimentos · Specs 20 (parte B) y 30 (parte A)
-
-- _completar_
+- _completar con enlaces a los PRs 1.0–1.6 y 3.1_
 
 **Parte de NLP/ML:** _completar_
 
-## Integrante 3 · Jovas Josue (@JOVAS45)
+## Jairo Vargas Figueroa (@jairovargasfigueroa)
 
-**Rol:** Backend, evaluación y tests · Specs 30 (parte B) y 40
+**Parte 2 · Análisis y métricas** · Specs 10 (EDA), 30 (comparación), 40 (`/metrics`), 50 (Métricas)
 
-- _completar_
-
-**Parte de NLP/ML:** _completar_
-
-## Integrante 4 · Adrian Rosales (@black7in)
-
-**Rol:** Frontend y explicación del pipeline · Specs 20 (parte C) y 50
-
-- _completar_
+- Organización del repositorio y especificaciones iniciales del proyecto (`specs/`, `AGENTS.md`, CI).
+- _completar con enlaces a los PRs 2.1–2.3_
 
 **Parte de NLP/ML:** _completar_
