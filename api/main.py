@@ -21,12 +21,16 @@ VERSION = "1.0.0"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Carga el modelo una sola vez al iniciar. Si no existe, la API arranca igual (503)."""
+    """Carga el modelo y sus métricas una sola vez al iniciar. Si no existen, la API arranca igual (503).
+
+    Las métricas se leen junto con el modelo para que /metrics describa siempre el modelo que
+    está sirviendo /predict: si se reentrena, hay que reiniciar uvicorn y cambian los dos a la vez.
+    """
     app.state.modelo = cargar_modelo() if RUTA_MODELO.exists() else None
-    app.state.nombre_modelo = (
-        json.loads(RUTA_METRICAS.read_text(encoding="utf-8"))["modelo_produccion"]
-        if RUTA_METRICAS.exists() else None
+    app.state.metricas = (
+        json.loads(RUTA_METRICAS.read_text(encoding="utf-8")) if RUTA_METRICAS.exists() else None
     )
+    app.state.nombre_modelo = app.state.metricas["modelo_produccion"] if app.state.metricas else None
     yield
 
 
@@ -81,3 +85,14 @@ def predict(entrada: EntradaPrediccion, request: Request):
     resultado = predecir(modelo, [texto])[0]
     return {**resultado, "modelo": request.app.state.nombre_modelo,
             "preprocesamiento": explicar_preprocesamiento(texto, modelo.named_steps["prep"].modo)}
+
+
+@app.get("/metrics", summary="Métricas y comparación de los modelos",
+         responses={503: {"description": "No hay modelo entrenado"}})
+def metrics(request: Request):
+    """Devuelve models/metricas.json (contrato C6): modelo en producción y por qué, métricas de
+    la línea base y de cada modelo, experimentos E1-E3, palabras influyentes y errores."""
+    if request.app.state.metricas is None:
+        raise ErrorAPI("MODELO_NO_DISPONIBLE",
+                       "No hay métricas: falta entrenar. Ejecuta: python -m src.models.train", 503)
+    return request.app.state.metricas
