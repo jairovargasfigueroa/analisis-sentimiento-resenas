@@ -5,23 +5,28 @@ Va de data/raw a models/ sin pasos manuales: carga, split, entrena, evalúa y gu
 
 import json
 from datetime import datetime
+from tempfile import TemporaryDirectory
 
 import joblib
-from sklearn.dummy import DummyClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, confusion_matrix, precision_recall_fscore_support
 from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 
-from src.config import ETIQUETAS, PARAMS, RUTA_METRICAS, RUTA_MODELO, SEED, TEST_SIZE
+from src.config import PARAMS, RUTA_METRICAS, RUTA_MODELO, SEED, TEST_SIZE
 from src.data.cargar import cargar_procesado
+from src.models.evaluacion import (analizar_errores, evaluar, evaluar_baseline,
+                                   palabras_influyentes)
+from src.models.experimentos import buscar_hiperparametros, experimentos, resumen_cv
 from src.nlp.preprocesador import TextPreprocessor
 
 # Nombre (el de params.yaml -> experiments.models) -> clasificador.
 # Para comparar otro modelo basta agregarlo aquí y su grilla en params.yaml.
 CLASIFICADORES = {
     "regresion_logistica": LogisticRegression(max_iter=1000, random_state=SEED),
+    # Multinomial: modela la frecuencia de cada término por clase; acepta los pesos TF-IDF.
+    "naive_bayes": MultinomialNB(),
 }
 
 
@@ -33,56 +38,91 @@ def dividir(df):
     )
 
 
-def construir_pipeline(clf, modo=None, ngram_range=None) -> Pipeline:
-    """prep -> tfidf -> clf, con los valores de params.yaml salvo que se indiquen otros."""
+def construir_pipeline(clf, modo=None, ngram_range=None, memoria=None) -> Pipeline:
+    """prep -> tfidf -> clf, con los valores de params.yaml salvo que se indiquen otros.
+
+    memoria: carpeta donde el Pipeline guarda el resultado de prep y tfidf. En GridSearchCV
+    solo cambia clf, así que cada partición se lematiza una vez y no una por combinación.
+    """
     tfidf = dict(PARAMS["tfidf"])
     tfidf["ngram_range"] = tuple(ngram_range or tfidf["ngram_range"])
     return Pipeline([
         ("prep", TextPreprocessor(modo=modo or PARAMS["nlp"]["modo"])),
         ("tfidf", TfidfVectorizer(**tfidf)),
         ("clf", clf),
-    ])
-
-
-def evaluar(modelo, X, y) -> dict:
-    """Métricas de C6 sobre (X, y). Macro: las dos clases pesan igual."""
-    pred = modelo.predict(X)
-    p, r, f1, _ = precision_recall_fscore_support(y, pred, average="macro", zero_division=0)
-    return {
-        "accuracy": round(accuracy_score(y, pred), 4),
-        "precision_macro": round(p, 4), "recall_macro": round(r, 4), "f1_macro": round(f1, 4),
-        "matriz_confusion": confusion_matrix(y, pred, labels=ETIQUETAS).tolist(),
-        "etiquetas": ETIQUETAS,
-    }
+    ], memory=memoria)
 
 
 def entrenar():
-    """Entrena la línea base y cada clasificador; devuelve (modelos, resultados, datos)."""
+    """Línea base, GridSearchCV de cada clasificador y experimentos.
+
+    Devuelve (modelos, resultados, experimentos, datos).
+
+    Los hiperparámetros se eligen con validación cruzada en train; test solo se reporta.
+    """
     df = cargar_procesado()
     X_train, X_test, y_train, y_test = dividir(df)
 
-    baseline = DummyClassifier(strategy="most_frequent").fit(X_train, y_train)
-    resultados = {"baseline": evaluar(baseline, X_test, y_test)}
+    resultados = {"baseline": evaluar_baseline(X_train, y_train, X_test, y_test)}
+    busquedas = {}
+    # Caché temporal compartida por los dos modelos y los experimentos: usan el mismo prep y tfidf.
+    with TemporaryDirectory() as memoria:
+        for nombre, clf in CLASIFICADORES.items():
+            pipeline = construir_pipeline(clf, memoria=memoria)
+            busquedas[nombre] = buscar_hiperparametros(pipeline, nombre, X_train, y_train)
+        mejor = max(busquedas, key=lambda n: busquedas[n].best_score_)
+        exps = experimentos(busquedas[mejor].best_estimator_, df, X_train, y_train)
+
     modelos = {}
-    for nombre, clf in CLASIFICADORES.items():
-        modelos[nombre] = construir_pipeline(clf).fit(X_train, y_train)
-        resultados[nombre] = evaluar(modelos[nombre], X_test, y_test)
-    return modelos, resultados, (df, X_train, X_test)
+    for nombre, busqueda in busquedas.items():
+        # Sin memoria antes de guardarlo: la carpeta temporal ya no existe.
+        modelos[nombre] = busqueda.best_estimator_.set_params(memory=None)
+        resultados[nombre] = {**evaluar(modelos[nombre], X_test, y_test), **resumen_cv(busqueda)}
+    return modelos, resultados, exps, (df, X_train, X_test, y_test)
 
 
-def guardar(modelos, resultados, datos) -> str:
+def elegir(resultados) -> str:
+    """El modelo con mayor F1 macro de validación cruzada. El de test no participa:
+    si se eligiera por test, el test dejaría de ser una medición independiente."""
+    candidatos = [n for n in resultados if "f1_cv_media" in resultados[n]]
+    return max(candidatos, key=lambda n: resultados[n]["f1_cv_media"])
+
+
+def justificar(elegido, resultados) -> str:
+    r = resultados[elegido]
+    otros = [f"{n.replace('_', ' ')} ({resultados[n]['f1_cv_media']:.3f})"
+             for n in resultados if n not in ("baseline", elegido)]
+    return (f"Mayor F1 macro en validación cruzada: {r['f1_cv_media']:.3f} ± {r['f1_cv_std']:.3f} "
+            f"frente a {', '.join(otros)}. En prueba obtiene {r['f1_macro']:.3f}, contra "
+            f"{resultados['baseline']['f1_macro']:.3f} de la línea base.")
+
+
+def errores_ejemplo(modelo, df, X_test, y_test, n=10) -> list[dict]:
+    """Los errores más seguros del modelo, con tema, fuente y año para poder explicarlos."""
+    filas = df.set_index("texto")  # los textos son únicos: cargar.py quita duplicados
+    ejemplos = []
+    for e in analizar_errores(modelo, X_test, y_test, n):
+        texto = X_test[e.pop("indice")]
+        fila = filas.loc[texto]
+        ejemplos.append({"texto": texto[:400], **e, "tema": fila["tema"],
+                         "fuente": fila["fuente"], "anio": int(fila["anio"])})
+    return ejemplos
+
+
+def guardar(modelos, resultados, exps, datos) -> str:
     """Guarda el modelo de producción y metricas.json (C6). Devuelve el nombre elegido."""
-    df, X_train, X_test = datos
-    # shortcut: elige por F1 en test porque aún no hay validación cruzada; el PR 2.2 la usa.
-    elegido = max(modelos, key=lambda n: resultados[n]["f1_macro"])
+    df, X_train, X_test, y_test = datos
+    elegido = elegir(resultados)
+    modelo = modelos[elegido]
     RUTA_MODELO.parent.mkdir(parents=True, exist_ok=True)
-    joblib.dump(modelos[elegido], RUTA_MODELO)
+    joblib.dump(modelo, RUTA_MODELO)
 
-    prep = modelos[elegido].named_steps["prep"]
-    tfidf = modelos[elegido].named_steps["tfidf"]
+    prep = modelo.named_steps["prep"]
+    tfidf = modelo.named_steps["tfidf"]
     metricas = {
         "modelo_produccion": elegido,
-        "justificacion": "Único modelo entrenado por ahora; supera ampliamente a la línea base.",
+        "criterio": "mayor F1 macro en validación cruzada (5 particiones, solo train)",
+        "justificacion": justificar(elegido, resultados),
         "fecha_entrenamiento": datetime.now().isoformat(timespec="seconds"),
         "dataset": {
             "nombre": "The Spanish Fake News Corpus",
@@ -94,15 +134,22 @@ def guardar(modelos, resultados, datos) -> str:
             "max_df": tfidf.max_df, "max_features": tfidf.max_features,
         },
         "modelos": resultados,
+        "experimentos": exps,
+        "palabras_influyentes": palabras_influyentes(modelo),
+        "errores_ejemplo": errores_ejemplo(modelo, df, X_test, y_test),
     }
     RUTA_METRICAS.write_text(json.dumps(metricas, ensure_ascii=False, indent=2), encoding="utf-8")
     return elegido
 
 
 if __name__ == "__main__":
-    modelos, resultados, datos = entrenar()
-    print(f"{'modelo':<22}{'accuracy':>10}{'f1_macro':>10}")
+    modelos, resultados, exps, datos = entrenar()
+    print(f"{'modelo':<22}{'f1_cv':>8}{'accuracy':>10}{'f1_test':>9}  hiperparámetros")
     for nombre, r in resultados.items():
-        print(f"{nombre:<22}{r['accuracy']:>10.3f}{r['f1_macro']:>10.3f}")
-    elegido = guardar(modelos, resultados, datos)
+        cv = f"{r['f1_cv_media']:.3f}" if "f1_cv_media" in r else "-"
+        print(f"{nombre:<22}{cv:>8}{r['accuracy']:>10.3f}{r['f1_macro']:>9.3f}  "
+              f"{r.get('mejores_hiperparametros', '')}")
+    for nombre, comparacion in exps.items():
+        print(f"{nombre}: " + ", ".join(f"{k} {v['f1_macro']:.3f}" for k, v in comparacion.items()))
+    elegido = guardar(modelos, resultados, exps, datos)
     print(f"Modelo en producción: {elegido} -> {RUTA_MODELO}")
