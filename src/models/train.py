@@ -10,17 +10,21 @@ import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 
 from src.config import PARAMS, RUTA_METRICAS, RUTA_MODELO, SEED, TEST_SIZE
 from src.data.cargar import cargar_procesado
 from src.models.evaluacion import evaluar, evaluar_baseline
+from src.models.experimentos import buscar_hiperparametros, resumen_cv
 from src.nlp.preprocesador import TextPreprocessor
 
 # Nombre (el de params.yaml -> experiments.models) -> clasificador.
 # Para comparar otro modelo basta agregarlo aquí y su grilla en params.yaml.
 CLASIFICADORES = {
     "regresion_logistica": LogisticRegression(max_iter=1000, random_state=SEED),
+    # Multinomial: modela la frecuencia de cada término por clase; acepta los pesos TF-IDF.
+    "naive_bayes": MultinomialNB(),
 }
 
 
@@ -44,15 +48,19 @@ def construir_pipeline(clf, modo=None, ngram_range=None) -> Pipeline:
 
 
 def entrenar():
-    """Entrena la línea base y cada clasificador; devuelve (modelos, resultados, datos)."""
+    """Línea base y GridSearchCV de cada clasificador; devuelve (modelos, resultados, datos).
+
+    Los hiperparámetros se eligen con validación cruzada en train; test solo se reporta.
+    """
     df = cargar_procesado()
     X_train, X_test, y_train, y_test = dividir(df)
 
     resultados = {"baseline": evaluar_baseline(X_train, y_train, X_test, y_test)}
     modelos = {}
     for nombre, clf in CLASIFICADORES.items():
-        modelos[nombre] = construir_pipeline(clf).fit(X_train, y_train)
-        resultados[nombre] = evaluar(modelos[nombre], X_test, y_test)
+        busqueda = buscar_hiperparametros(construir_pipeline(clf), nombre, X_train, y_train)
+        modelos[nombre] = busqueda.best_estimator_
+        resultados[nombre] = {**evaluar(modelos[nombre], X_test, y_test), **resumen_cv(busqueda)}
     return modelos, resultados, (df, X_train, X_test)
 
 
@@ -87,8 +95,10 @@ def guardar(modelos, resultados, datos) -> str:
 
 if __name__ == "__main__":
     modelos, resultados, datos = entrenar()
-    print(f"{'modelo':<22}{'accuracy':>10}{'f1_macro':>10}")
+    print(f"{'modelo':<22}{'f1_cv':>8}{'accuracy':>10}{'f1_test':>9}  hiperparámetros")
     for nombre, r in resultados.items():
-        print(f"{nombre:<22}{r['accuracy']:>10.3f}{r['f1_macro']:>10.3f}")
+        cv = f"{r['f1_cv_media']:.3f}" if "f1_cv_media" in r else "-"
+        print(f"{nombre:<22}{cv:>8}{r['accuracy']:>10.3f}{r['f1_macro']:>9.3f}  "
+              f"{r.get('mejores_hiperparametros', '')}")
     elegido = guardar(modelos, resultados, datos)
     print(f"Modelo en producción: {elegido} -> {RUTA_MODELO}")
