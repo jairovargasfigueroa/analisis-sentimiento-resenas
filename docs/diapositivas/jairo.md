@@ -4,7 +4,7 @@ Guion y contenido de cada diapositiva. Van después de la demo de Brayan y se un
 
 ---
 
-## 7 · Lo que mostró la EDA
+## 6 · Lo que mostró la EDA
 
 **La fuente casi decide la etiqueta.**
 
@@ -17,7 +17,7 @@ Guion y contenido de cada diapositiva. Van después de la demo de Brayan y se un
 
 ---
 
-## 8 · Dos modelos, elegidos con validación cruzada
+## 7 · Dos modelos, elegidos con validación cruzada
 
 | | F1 validación cruzada | F1 prueba |
 |---|---|---|
@@ -33,7 +33,7 @@ Guion y contenido de cada diapositiva. Van después de la demo de Brayan y se un
 
 ---
 
-## 9 · Qué aporta cada decisión
+## 8 · Qué aporta cada decisión
 
 | Experimento (mismo modelo, cambia una cosa) | Resultado |
 |---|---|
@@ -45,7 +45,7 @@ Guion y contenido de cada diapositiva. Van después de la demo de Brayan y se un
 
 ---
 
-## 10 · Pestaña Métricas (demo)
+## 9 · Pestaña Métricas (demo)
 
 1. Tarjeta del modelo en producción con su justificación.
 2. Tabla comparativa y barras de F1.
@@ -56,7 +56,7 @@ Guion y contenido de cada diapositiva. Van después de la demo de Brayan y se un
 
 ---
 
-## 11 · Cuándo se equivoca
+## 10 · Cuándo se equivoca
 
 | Error | Por qué |
 |---|---|
@@ -69,7 +69,7 @@ Guion y contenido de cada diapositiva. Van después de la demo de Brayan y se un
 
 ---
 
-## 12 · Conclusiones
+## 11 · Conclusiones
 
 - Supera a la línea base por **44 puntos** de F1 con dos modelos simples y explicables.
 - **Aprende cómo está escrita una noticia, no si es verdad.** Es una primera señal, no un verificador.

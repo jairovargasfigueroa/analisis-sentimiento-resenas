@@ -4,16 +4,18 @@
 <meta charset="utf-8">
 <title>Detector de Noticias Falsas · Presentación</title>
 <!--
-  Diapositivas del proyecto. Contenido y guion: brayan.md (1-6) y jairo.md (7-12).
+  Diapositivas del proyecto. Contenido y guion: brayan.md (1-5) y jairo.md (6-11).
   Se exporta a docs/presentacion.pdf con Chrome:
     chrome --headless --print-to-pdf=docs/presentacion.pdf --no-pdf-header-footer docs/diapositivas/presentacion.html
   También se puede abrir en el navegador y presentar con Ctrl+P -> Guardar como PDF.
+  Los gráficos son barras de HTML/CSS con los números de models/metricas.json y de la EDA.
 -->
 <style>
   @page { size: 13.333in 7.5in; margin: 0; }
   :root {
     --tinta: #1d2329; --suave: #5b6670; --borde: #dfe3e8; --fondo: #ffffff; --panel: #f4f6f9;
-    --acento: #2f5bd3; --falsa: #c2362f; --falsa-suave: #fbe9e7; --verdadera: #1f7a4d; --verdadera-suave: #e3f3ea;
+    --acento: #2f5bd3; --gris: #9aa4ae; --falsa: #c2362f; --falsa-suave: #fbe9e7;
+    --verdadera: #1f7a4d; --verdadera-suave: #e3f3ea; --naranja: #e08a1e;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: #888; }
@@ -25,21 +27,20 @@
   @media print { html, body { background: none; } .slide { margin: 0; } }
   .slide::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background: var(--acento); }
   .seccion { font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--suave); margin: 0 0 6px; }
-  h1 { font-size: 44px; line-height: 1.15; margin: 0 0 18px; }
-  h2 { font-size: 26px; margin: 0 0 12px; color: var(--acento); }
+  h1 { font-size: 42px; line-height: 1.15; margin: 0 0 18px; }
+  h3 { font-size: 17px; margin: 0 0 10px; color: var(--suave); text-transform: uppercase; letter-spacing: .05em; }
   p { margin: 0 0 12px; }
   ul { margin: 0; padding-left: 1.1em; } li { margin: 0 0 10px; }
   strong { font-weight: 700; }
   code { font-family: ui-monospace, Consolas, monospace; font-size: .86em; background: var(--panel); padding: 1px 6px; border-radius: 5px; }
   .pie { position: absolute; left: 0.75in; right: 0.75in; bottom: 0.25in; display: flex; justify-content: space-between;
          font-size: 13px; color: var(--suave); }
-  .columnas { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start; }
+  .columnas { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+  .columnas.ancha { grid-template-columns: 1.25fr 1fr; }
   table { border-collapse: collapse; width: 100%; font-size: 20px; font-variant-numeric: tabular-nums; }
   th, td { padding: 8px 12px; border-bottom: 1px solid var(--borde); text-align: left; }
   th { color: var(--suave); font-size: 15px; text-transform: uppercase; letter-spacing: .04em; }
-  tr.destacada td { font-weight: 700; background: #eef3ff; }
-  .num { text-align: right; }
-  .caja { background: var(--panel); border-radius: 14px; padding: 18px 22px; }
+  .caja { background: var(--panel); border-radius: 14px; padding: 16px 22px; font-size: 20px; }
   .flujo { font-family: ui-monospace, Consolas, monospace; font-size: 19px; background: var(--panel);
            border-radius: 12px; padding: 14px 18px; margin: 0 0 18px; }
   .flujo b { color: var(--acento); }
@@ -47,18 +48,32 @@
   .chip { display: inline-block; border-radius: 999px; padding: 2px 12px; font-size: 16px; font-weight: 700; }
   .chip.falsa { background: var(--falsa-suave); color: var(--falsa); }
   .chip.verdadera { background: var(--verdadera-suave); color: var(--verdadera); }
-  .grande { font-size: 64px; font-weight: 800; line-height: 1; }
-  .cifra { display: flex; flex-direction: column; gap: 6px; }
-  .cifras { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 8px; }
-  .matriz td { text-align: center; font-size: 30px; font-weight: 800; width: 180px; height: 92px; border: 4px solid #fff; border-radius: 10px; }
+  .matriz td { text-align: center; font-size: 30px; font-weight: 800; width: 170px; height: 88px; border: 4px solid #fff; border-radius: 10px; }
   .matriz td small { display: block; font-size: 15px; font-weight: 400; color: var(--suave); }
   .matriz th { text-align: center; }
   .ok { background: var(--verdadera-suave); } .mal { background: var(--falsa-suave); }
   .portada { justify-content: center; background: linear-gradient(135deg, #1e3a8a, #2f5bd3); color: #fff; }
   .portada::before { display: none; }
-  .portada h1 { font-size: 64px; } .portada p { font-size: 26px; opacity: .92; }
+  .portada h1 { font-size: 62px; } .portada p { font-size: 26px; opacity: .92; }
   .portada .pie { color: rgba(255,255,255,.8); }
-  .nota { font-size: 17px; color: var(--suave); }
+  .nota { font-size: 16px; color: var(--suave); }
+
+  /* Gráficos de barras horizontales */
+  .grafico { display: flex; flex-direction: column; gap: 10px; font-size: 18px; }
+  .barra { display: grid; grid-template-columns: var(--etiqueta, 190px) 1fr 74px; align-items: center; gap: 12px; }
+  .barra .pista { height: 26px; background: var(--panel); border-radius: 6px; overflow: hidden; display: flex; }
+  .barra .pista > div { height: 100%; }
+  .barra .valor { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .barra.fina .pista { height: 14px; }
+  .grupo { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+  .grupo .titulo { font-weight: 700; font-size: 18px; }
+  .leyenda { display: flex; gap: 18px; font-size: 15px; color: var(--suave); margin: 2px 0 10px; }
+  .leyenda span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; background: var(--c); vertical-align: -1px; }
+  .c-acento { background: var(--acento); } .c-gris { background: var(--gris); } .c-naranja { background: var(--naranja); }
+  .c-falsa { background: var(--falsa); } .c-verdadera { background: var(--verdadera); }
+  .c-falsa-suave { background: #e9a39d; } .c-verdadera-suave { background: #8fc9aa; }
+  .escala { display: grid; grid-template-columns: var(--etiqueta, 190px) 1fr 74px; gap: 12px; font-size: 13px; color: var(--suave); }
+  .escala div { display: flex; justify-content: space-between; }
 </style>
 </head>
 <body>
@@ -86,40 +101,42 @@
   <div class="pie"><span>Brayan</span><span>1</span></div>
 </section>
 
-<!-- 2 · Datos -->
+<!-- 2 · Datos y formato del corpus -->
 <section class="slide">
   <p class="seccion">2 · Datos</p>
   <h1>The Spanish Fake News Corpus</h1>
-  <p class="nota">CC BY 4.0 · etiquetado a mano · Posadas-Durán et al. (2019) y FakeDeS, IberLEF 2021</p>
-  <table style="margin:12px 0 22px">
-    <tr><th></th><th>Período</th><th class="num">Noticias</th><th class="num">Verdaderas / falsas</th></tr>
-    <tr><td>v1</td><td>2018</td><td class="num">971</td><td class="num">491 / 480</td></tr>
-    <tr><td>v2 (FakeDeS 2021)</td><td>2020–21</td><td class="num">572</td><td class="num">286 / 286</td></tr>
-  </table>
-  <ul>
-    <li>1.542 noticias después de quitar 1 duplicado: <strong>balanceado</strong>, sin <code>class_weight</code>.</li>
-    <li>Split estratificado 80/20 con <code>SEED = 42</code> → 1.233 de entrenamiento / 309 de prueba.</li>
-    <li>La <strong>fuente no entra al modelo</strong>: hay sitios satíricos que solo publican falsas.</li>
-  </ul>
+  <p class="nota" style="margin-top:-8px">CC BY 4.0 · etiquetado a mano · Posadas-Durán et al. (2019) y FakeDeS, IberLEF 2021</p>
+  <div class="columnas ancha">
+    <div>
+      <h3>Noticias por versión y clase</h3>
+      <div class="leyenda"><span style="--c:var(--verdadera)">verdaderas</span><span style="--c:var(--falsa)">falsas</span></div>
+      <div class="grafico" style="--etiqueta:150px">
+        <div class="barra"><span>v1 · 2018</span><div class="pista"><div class="c-verdadera" style="width:50.6%"></div><div class="c-falsa" style="width:49.4%"></div></div><span class="valor">971</span></div>
+        <div class="barra"><span>v2 · 2020–21</span><div class="pista" style="width:58.9%"><div class="c-verdadera" style="width:50%"></div><div class="c-falsa" style="width:50%"></div></div><span class="valor">572</span></div>
+      </div>
+      <ul style="margin-top:20px; font-size:20px">
+        <li>1.542 noticias tras quitar 1 duplicado: <strong>balanceado</strong> (777 / 765).</li>
+        <li>Split estratificado 80/20, <code>SEED = 42</code> → 1.233 / 309.</li>
+        <li>La <strong>fuente no entra al modelo</strong>.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Las dos versiones no tienen el mismo formato</h3>
+      <ul style="font-size:20px">
+        <li>Encabezados distintos: <code>Category</code> / <code>CATEGORY</code>, <code>Topic</code> / <code>TOPICS</code>.</li>
+        <li>Etiqueta como texto (<code>Fake</code>) en v1 y booleano (<code>False</code>) en v2.</li>
+        <li>La v1 repite el titular dentro del cuerpo (943 de 971).</li>
+        <li>La v1 anonimiza cifras y enlaces (<code>*NUMBER*</code>, <code>*URL*</code>).</li>
+      </ul>
+      <p class="caja" style="margin-top:14px">Sin igualarlo, el modelo aprende <strong>de qué año es</strong> la noticia. Corregirlo bajó el F1 base de 0,796 a 0,786: ese punto era falso.</p>
+    </div>
+  </div>
   <div class="pie"><span>Brayan</span><span>2</span></div>
 </section>
 
-<!-- 3 · Formato -->
+<!-- 3 · Pipeline -->
 <section class="slide">
-  <p class="seccion">3 · Lo que encontramos en los datos</p>
-  <h1>Las dos versiones no tienen el mismo formato</h1>
-  <ul>
-    <li>La v1 repite el titular dentro del cuerpo (943 de 971).</li>
-    <li>La v1 anonimiza cifras y enlaces (<code>*NUMBER*</code>, <code>*URL*</code>); la v2 trae los reales.</li>
-    <li>Sin igualarlo, el modelo aprende <strong>de qué año es</strong> la noticia, no si es falsa.</li>
-  </ul>
-  <div class="caja" style="margin-top:22px">Corregirlo bajó el F1 del modelo base de 0,796 a <strong>0,786</strong>: ese punto no venía del contenido.</div>
-  <div class="pie"><span>Brayan</span><span>3</span></div>
-</section>
-
-<!-- 4 · Pipeline -->
-<section class="slide">
-  <p class="seccion">4 · Pipeline de NLP</p>
+  <p class="seccion">3 · Pipeline de NLP</p>
   <h1>Un solo Pipeline, igual al entrenar y al predecir</h1>
   <div class="flujo">normalizar → tokenizar → stop words → <b>lematizar</b> → quitar tildes → TF-IDF → modelo</div>
   <p class="ejemplo">¡¡ALERTA!! La OMS confirmó que 3 niños murieron 😱 https://…</p>
@@ -129,12 +146,12 @@
     <li>Se <strong>conservan las negaciones</strong>: «no hay vacuna» ≠ «hay vacuna».</li>
     <li>Se serializa entero (<code>.joblib</code>): la API no reimplementa el preprocesamiento.</li>
   </ul>
-  <div class="pie"><span>Brayan</span><span>4</span></div>
+  <div class="pie"><span>Brayan</span><span>3</span></div>
 </section>
 
-<!-- 5 · Tildes -->
+<!-- 4 · Tildes -->
 <section class="slide">
-  <p class="seccion">5 · La decisión que más cuesta explicar</p>
+  <p class="seccion">4 · La decisión que más cuesta explicar</p>
   <h1>Las tildes se quitan al final</h1>
   <div class="columnas">
     <table>
@@ -145,16 +162,16 @@
     <ul>
       <li>spaCy necesita las tildes → se lematiza <strong>antes</strong> de quitarlas.</li>
       <li>Snowball (stemming) une palabras distintas: «murieron» y «muro» → <code>mur</code>.</li>
-      <li>Lema y stem se comparan con validación cruzada en el experimento E1 (diapositiva 9).</li>
+      <li>Lema y stem se comparan con validación cruzada en el experimento E1 (diapositiva 8).</li>
     </ul>
   </div>
-  <div class="pie"><span>Brayan</span><span>5</span></div>
+  <div class="pie"><span>Brayan</span><span>4</span></div>
 </section>
 
-<!-- 6 · Demo -->
+<!-- 5 · Demo -->
 <section class="slide">
-  <p class="seccion">6 · Demo en vivo</p>
-  <h1>Pestaña Analizar</h1>
+  <p class="seccion">5 · Demo en vivo</p>
+  <h1>Pestañas Analizar y Lote</h1>
   <ol style="padding-left:1.2em">
     <li>Cabecera con <strong>punto verde</strong>: API y modelo listos (<code>GET /health</code>).</li>
     <li>Botón de ejemplo «Falsa 2021» → <span class="chip falsa">Parece falsa</span> con su probabilidad.</li>
@@ -163,81 +180,142 @@
     <li>Pestaña <strong>Lote</strong>: subir <code>ejemplo_lote.csv</code> → 6 noticias con su resumen.</li>
   </ol>
   <p class="nota" style="margin-top:20px">Pasa a Jairo: pestaña Métricas.</p>
-  <div class="pie"><span>Brayan</span><span>6</span></div>
+  <div class="pie"><span>Brayan</span><span>5</span></div>
 </section>
 
-<!-- 7 · EDA (Jairo) -->
+<!-- 6 · EDA (Jairo) -->
 <section class="slide">
-  <p class="seccion">7 · Lo que mostró la EDA</p>
+  <p class="seccion">6 · Lo que mostró la EDA</p>
   <h1>La fuente casi decide la etiqueta</h1>
-  <div class="cifras">
-    <div class="cifra"><span class="grande">14</span><span>de 347 fuentes publican de las dos clases</span></div>
-    <div class="cifra"><span class="grande">96 %</span><span>de las falsas vienen de sitios que nunca publican una verdadera</span></div>
-    <div class="cifra"><span class="grande">26 / 0</span><span>«bbc» en verdaderas / falsas: la firma se cuela en el texto</span></div>
+  <div class="columnas">
+    <div>
+      <h3>¿De qué fuentes viene cada clase?</h3>
+      <div class="leyenda"><span style="--c:var(--falsa)">fuente que solo publica falsas</span><span style="--c:var(--verdadera)">solo verdaderas</span><span style="--c:var(--gris)">ambas</span></div>
+      <div class="grafico" style="--etiqueta:110px">
+        <div class="barra"><span>Falsas</span><div class="pista"><div class="c-falsa" style="width:96.1%"></div><div class="c-gris" style="width:3.9%"></div></div><span class="valor">96 %</span></div>
+        <div class="barra"><span>Verdaderas</span><div class="pista"><div class="c-verdadera" style="width:77.9%"></div><div class="c-gris" style="width:22.1%"></div></div><span class="valor">78 %</span></div>
+      </div>
+      <h3 style="margin-top:26px">Firmas de agencia dentro del texto</h3>
+      <div class="leyenda"><span style="--c:var(--verdadera)">en verdaderas</span><span style="--c:var(--falsa)">en falsas</span></div>
+      <div class="grafico" style="--etiqueta:110px">
+        <div class="barra fina"><span>«bbc»</span><div class="pista"><div class="c-verdadera" style="width:100%"></div></div><span class="valor">26 / 0</span></div>
+        <div class="barra fina"><span>«reuters»</span><div class="pista"><div class="c-verdadera" style="width:30.8%"></div></div><span class="valor">8 / 0</span></div>
+        <div class="barra fina"><span>«afp»</span><div class="pista"><div class="c-verdadera" style="width:26.9%"></div></div><span class="valor">7 / 0</span></div>
+        <div class="barra fina"><span>«efe»</span><div class="pista"><div class="c-verdadera" style="width:26.9%"></div><div class="c-falsa" style="width:7.7%"></div></div><span class="valor">7 / 2</span></div>
+      </div>
+    </div>
+    <ul style="font-size:20px">
+      <li>De 347 fuentes, solo <strong>14</strong> publican de las dos clases.</li>
+      <li>Sitios satíricos: <em>El Dizque</em> (143), <em>El Ruinaversal</em> (94).</li>
+      <li>La fuente <strong>no entra al modelo</strong>: acertaría sin leer el texto.</li>
+      <li>Las firmas de agencia van como <strong>stop words</strong>: el F1 de CV no cambia (0,7631 → 0,7623).</li>
+      <li>Además: las falsas son más cortas (283 vs 436 palabras) y usan más exclamaciones (15 % vs 9 %).</li>
+    </ul>
   </div>
-  <ul style="margin-top:26px">
-    <li>Sitios satíricos: <em>El Dizque</em> (143), <em>El Ruinaversal</em> (94).</li>
-    <li>La fuente <strong>no entra al modelo</strong>: acertaría sin leer el texto.</li>
-    <li>Las firmas de agencia (<code>bbc, afp, efe, reuters, notimex</code>) van como stop words: el F1 de CV no cambia (0,7631 → 0,7623).</li>
-  </ul>
+  <div class="pie"><span>Jairo</span><span>6</span></div>
+</section>
+
+<!-- 7 · Modelos -->
+<section class="slide">
+  <p class="seccion">7 · Modelos</p>
+  <h1>Dos modelos, elegidos con validación cruzada</h1>
+  <div class="columnas ancha">
+    <div>
+      <h3>F1 macro por modelo</h3>
+      <div class="leyenda"><span style="--c:var(--acento)">validación cruzada (decide)</span><span style="--c:var(--naranja)">prueba (solo se reporta)</span></div>
+      <div class="grupo"><span class="titulo">Regresión Logística ★ (C = 10)</span>
+        <div class="barra" style="--etiqueta:0px"><span></span><div class="pista"><div class="c-acento" style="width:76.6%"></div></div><span class="valor">0,766</span></div>
+        <div class="barra" style="--etiqueta:0px"><span></span><div class="pista"><div class="c-naranja" style="width:77.3%"></div></div><span class="valor">0,773</span></div>
+      </div>
+      <div class="grupo"><span class="titulo">Naive Bayes (alpha = 0,1)</span>
+        <div class="barra" style="--etiqueta:0px"><span></span><div class="pista"><div class="c-acento" style="width:69.5%"></div></div><span class="valor">0,695</span></div>
+        <div class="barra" style="--etiqueta:0px"><span></span><div class="pista"><div class="c-naranja" style="width:73.2%"></div></div><span class="valor">0,732</span></div>
+      </div>
+      <div class="grupo"><span class="titulo">Línea base (siempre la mayoritaria)</span>
+        <div class="barra" style="--etiqueta:0px"><span></span><div class="pista"><div class="c-naranja" style="width:33.6%"></div></div><span class="valor">0,336</span></div>
+      </div>
+    </div>
+    <div>
+      <h3>Búsqueda de C (Regresión Logística, CV)</h3>
+      <div class="grafico" style="--etiqueta:70px">
+        <div class="barra fina"><span>C = 0,1</span><div class="pista"><div class="c-gris" style="width:73.8%"></div></div><span class="valor">0,738</span></div>
+        <div class="barra fina"><span>C = 1</span><div class="pista"><div class="c-gris" style="width:76.2%"></div></div><span class="valor">0,762</span></div>
+        <div class="barra fina"><span>C = 10</span><div class="pista"><div class="c-acento" style="width:76.6%"></div></div><span class="valor">0,766</span></div>
+        <div class="barra fina"><span>C = 30</span><div class="pista"><div class="c-gris" style="width:76.2%"></div></div><span class="valor">0,762</span></div>
+      </div>
+      <ul style="margin-top:22px; font-size:19px">
+        <li><code>GridSearchCV</code>, 5 particiones, <strong>solo con train</strong>.</li>
+        <li>Se elige por CV; la prueba se mira una vez, al final.</li>
+        <li>Naive Bayes supone palabras independientes; con bigramas («no», «no creer») no se cumple.</li>
+      </ul>
+    </div>
+  </div>
   <div class="pie"><span>Jairo</span><span>7</span></div>
 </section>
 
-<!-- 8 · Modelos -->
+<!-- 8 · Experimentos -->
 <section class="slide">
-  <p class="seccion">8 · Modelos</p>
-  <h1>Dos modelos, elegidos con validación cruzada</h1>
-  <table>
-    <tr><th>Modelo</th><th class="num">F1 validación cruzada</th><th class="num">F1 prueba</th></tr>
-    <tr><td>Línea base (siempre la mayoritaria)</td><td class="num">—</td><td class="num">0,336</td></tr>
-    <tr class="destacada"><td>Regresión Logística (C = 10) ★</td><td class="num">0,766 ± 0,006</td><td class="num">0,773</td></tr>
-    <tr><td>Naive Bayes (alpha = 0,1)</td><td class="num">0,695 ± 0,024</td><td class="num">0,732</td></tr>
-  </table>
-  <ul style="margin-top:22px">
-    <li><code>GridSearchCV</code>, 5 particiones estratificadas, <strong>solo con train</strong>.</li>
-    <li>Se elige por F1 de validación cruzada; la prueba se mira una sola vez, al final.</li>
-    <li>Naive Bayes supone palabras independientes; con bigramas («no», «no creer») no se cumple.</li>
-  </ul>
+  <p class="seccion">8 · Qué aporta cada decisión</p>
+  <h1>Mismo modelo, cambia una sola cosa</h1>
+  <div class="columnas">
+    <div>
+      <div class="grupo"><span class="titulo">E1 · stem vs lema (F1 CV)</span>
+        <div class="barra" style="--etiqueta:100px"><span>stem</span><div class="pista"><div class="c-gris" style="width:76.58%"></div></div><span class="valor">0,766</span></div>
+        <div class="barra" style="--etiqueta:100px"><span>lema ★</span><div class="pista"><div class="c-acento" style="width:76.63%"></div></div><span class="valor">0,766</span></div>
+      </div>
+      <div class="grupo" style="margin-top:12px"><span class="titulo">E2 · n-gramas (F1 CV)</span>
+        <div class="barra" style="--etiqueta:100px"><span>(1,1)</span><div class="pista"><div class="c-gris" style="width:76.02%"></div></div><span class="valor">0,760</span></div>
+        <div class="barra" style="--etiqueta:100px"><span>(1,2) ★</span><div class="pista"><div class="c-acento" style="width:76.63%"></div></div><span class="valor">0,766</span></div>
+      </div>
+      <div class="grupo" style="margin-top:12px"><span class="titulo">E3 · otra época (F1)</span>
+        <div class="barra" style="--etiqueta:100px"><span>mezcla</span><div class="pista"><div class="c-acento" style="width:77.3%"></div></div><span class="valor">0,773</span></div>
+        <div class="barra" style="--etiqueta:100px"><span>2018→21</span><div class="pista"><div class="c-falsa" style="width:64.3%"></div></div><span class="valor">0,643</span></div>
+      </div>
+    </div>
+    <ul style="font-size:20px">
+      <li><strong>E1:</strong> empate; queda <strong>lema</strong> porque varía la mitad entre particiones (± 0,006 vs ± 0,015) y sus términos son palabras reales.</li>
+      <li><strong>E2:</strong> los bigramas suman 0,6 puntos: «no creer», «fuente cercano», «año pasado».</li>
+      <li><strong>E3:</strong> entrenar con 2018 y probar con 2020-21 cae a 0,643: el COVID no existía en 2018.</li>
+      <li class="caja" style="list-style:none; margin-left:-1.1em; margin-top:16px">E3 es un hallazgo, no un fracaso: el modelo aprende una época y habría que reentrenarlo.</li>
+    </ul>
+  </div>
   <div class="pie"><span>Jairo</span><span>8</span></div>
 </section>
 
-<!-- 9 · Experimentos -->
+<!-- 9 · Métricas -->
 <section class="slide">
-  <p class="seccion">9 · Qué aporta cada decisión</p>
-  <h1>Mismo modelo, cambia una sola cosa</h1>
-  <table>
-    <tr><th>Experimento</th><th>Resultado (F1)</th><th>Decisión</th></tr>
-    <tr><td>E1 · stem vs lema</td><td>0,766 vs 0,766</td><td><strong>lema</strong>: igual de preciso, la mitad de variación</td></tr>
-    <tr><td>E2 · unigramas vs + bigramas</td><td>0,760 → 0,766</td><td><strong>bigramas</strong>: «no creer», «año pasado»</td></tr>
-    <tr><td>E3 · entrenar 2018, probar 2020-21</td><td><strong>0,643</strong></td><td>el COVID no existía en 2018</td></tr>
-  </table>
-  <p class="caja" style="margin-top:24px">E3 es un hallazgo, no un fracaso: el modelo aprende una época y habría que reentrenarlo.</p>
+  <p class="seccion">9 · Pestaña Métricas (demo)</p>
+  <h1>Matriz de confusión y palabras que pesan</h1>
+  <div class="columnas">
+    <div>
+      <table class="matriz">
+        <tr><th></th><th>predicho falsa</th><th>predicho verdadera</th></tr>
+        <tr><th>real falsa</th><td class="ok">116<small>75,8 %</small></td><td class="mal">37<small>24,2 %</small></td></tr>
+        <tr><th>real verdadera</th><td class="mal">33<small>21,2 %</small></td><td class="ok">123<small>78,8 %</small></td></tr>
+      </table>
+      <p class="nota" style="margin-top:12px">Errores repartidos (37 y 33): sin sesgo hacia una clase.</p>
+    </div>
+    <div>
+      <h3>Peso de cada término (coeficiente)</h3>
+      <div class="grafico" style="--etiqueta:120px; font-size:17px">
+        <div class="barra fina"><span>revelar</span><div class="pista" style="justify-content:flex-end"><div class="c-falsa" style="width:98%"></div></div><span class="valor">falsa</span></div>
+        <div class="barra fina"><span>exclamacion</span><div class="pista" style="justify-content:flex-end"><div class="c-falsa" style="width:98%"></div></div><span class="valor">falsa</span></div>
+        <div class="barra fina"><span>pueblo</span><div class="pista" style="justify-content:flex-end"><div class="c-falsa" style="width:67%"></div></div><span class="valor">falsa</span></div>
+        <div class="barra fina"><span>nadie</span><div class="pista" style="justify-content:flex-end"><div class="c-falsa" style="width:65%"></div></div><span class="valor">falsa</span></div>
+        <div class="barra fina"><span>dos</span><div class="pista"><div class="c-verdadera" style="width:100%"></div></div><span class="valor">verdad.</span></div>
+        <div class="barra fina"><span>pasado</span><div class="pista"><div class="c-verdadera" style="width:81%"></div></div><span class="valor">verdad.</span></div>
+        <div class="barra fina"><span>martes</span><div class="pista"><div class="c-verdadera" style="width:72%"></div></div><span class="valor">verdad.</span></div>
+        <div class="barra fina"><span>lunes</span><div class="pista"><div class="c-verdadera" style="width:71%"></div></div><span class="valor">verdad.</span></div>
+      </div>
+      <p class="nota" style="margin-top:10px">Tono y apelación → falsa · cifras y días (lenguaje de agencia) → verdadera.</p>
+    </div>
+  </div>
   <div class="pie"><span>Jairo</span><span>9</span></div>
 </section>
 
-<!-- 10 · Métricas -->
+<!-- 10 · Errores -->
 <section class="slide">
-  <p class="seccion">10 · Pestaña Métricas (demo)</p>
-  <h1>Matriz de confusión · Regresión Logística</h1>
-  <div class="columnas">
-    <table class="matriz">
-      <tr><th></th><th>predicho falsa</th><th>predicho verdadera</th></tr>
-      <tr><th>real falsa</th><td class="ok">116<small>75,8 %</small></td><td class="mal">37<small>24,2 %</small></td></tr>
-      <tr><th>real verdadera</th><td class="mal">33<small>21,2 %</small></td><td class="ok">123<small>78,8 %</small></td></tr>
-    </table>
-    <ul>
-      <li>Errores repartidos (37 y 33): <strong>sin sesgo</strong> hacia una clase.</li>
-      <li>Hacia <span class="chip verdadera">verdadera</span>: cifras, días («lunes», «martes»), crónica.</li>
-      <li>Hacia <span class="chip falsa">falsa</span>: «revelar», exclamaciones, «pueblo», «nadie».</li>
-      <li>En la app: tabla comparativa, experimentos y errores más seguros.</li>
-    </ul>
-  </div>
-  <div class="pie"><span>Jairo</span><span>10</span></div>
-</section>
-
-<!-- 11 · Errores -->
-<section class="slide">
-  <p class="seccion">11 · Cuándo se equivoca</p>
+  <p class="seccion">10 · Cuándo se equivoca</p>
   <h1>Falla cuando el estilo engaña</h1>
   <table style="font-size:18px">
     <tr><th>Noticia</th><th>Predicción</th><th>Por qué</th></tr>
@@ -246,12 +324,12 @@
     <tr><td>«Feministas protestan frente a Palacio Nacional»</td><td><span class="chip falsa">falsa 82 %</span></td><td>Palabra de tema que en el corpus abunda en bulos</td></tr>
     <tr><td>«Messi: todavía estoy a tiempo de jugar con España»</td><td><span class="chip verdadera">verdadera 80 %</span></td><td>Sátira escrita como entrevista</td></tr>
   </table>
-  <div class="pie"><span>Jairo</span><span>11</span></div>
+  <div class="pie"><span>Jairo</span><span>10</span></div>
 </section>
 
-<!-- 12 · Conclusiones -->
+<!-- 11 · Conclusiones -->
 <section class="slide">
-  <p class="seccion">12 · Conclusiones</p>
+  <p class="seccion">11 · Conclusiones</p>
   <h1>Una primera señal, no un verificador</h1>
   <ul>
     <li>Supera a la línea base por <strong>44 puntos</strong> de F1 con dos modelos simples y explicables.</li>
@@ -261,7 +339,7 @@
     <li>Reproducible: <code>python -m src.models.train</code> da siempre los mismos números (SEED = 42).</li>
   </ul>
   <p class="caja" style="margin-top:20px">Todo sale de <code>params.yaml</code>: cambiar una línea y reentrenar con <code>--rapido</code> tarda ~45 s.</p>
-  <div class="pie"><span>Jairo</span><span>12</span></div>
+  <div class="pie"><span>Jairo</span><span>11</span></div>
 </section>
 
 </body>

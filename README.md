@@ -146,7 +146,7 @@ Cambiar un valor de `params.yaml` y reentrenar (`python -m src.models.train --ra
 
 ## Presentación
 
-[`docs/presentacion.pdf`](docs/presentacion.pdf): 12 diapositivas más la portada. El guion de cada una está en [`docs/diapositivas/`](docs/diapositivas/) y el PDF se regenera desde `presentacion.html` (instrucciones en el propio archivo).
+[`docs/presentacion.pdf`](docs/presentacion.pdf): 11 diapositivas más la portada. El guion de cada una está en [`docs/diapositivas/`](docs/diapositivas/) y el PDF se regenera desde `presentacion.html` (instrucciones en el propio archivo).
 
 ## Enunciado
 
