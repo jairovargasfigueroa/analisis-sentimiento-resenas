@@ -25,3 +25,5 @@ export const predecir = (texto) =>
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ texto }),
   });
+
+export const metricas = () => pedir("/metrics");

@@ -82,3 +82,30 @@ def test_cors_permite_el_frontend(cliente):
     r = cliente.options("/predict", headers={"Origin": "http://localhost:5173",
                                              "Access-Control-Request-Method": "POST"})
     assert r.headers["access-control-allow-origin"] == "http://localhost:5173"
+
+
+METRICAS = {
+    "modelo_produccion": "regresion_logistica",
+    "modelos": {"baseline": {"f1_macro": 0.34}, "regresion_logistica": {"f1_macro": 0.77}},
+}
+
+
+def test_metrics_devuelve_metricas_json(cliente):
+    guardado = app.state.metricas
+    app.state.metricas = METRICAS
+    try:
+        r = cliente.get("/metrics")
+        assert r.status_code == 200
+        assert r.json() == METRICAS
+    finally:
+        app.state.metricas = guardado
+
+
+def test_metrics_sin_entrenar_responde_503(cliente):
+    guardado = app.state.metricas
+    app.state.metricas = None
+    try:
+        r = cliente.get("/metrics")
+        assert r.status_code == 503 and codigo(r) == "MODELO_NO_DISPONIBLE"
+    finally:
+        app.state.metricas = guardado
