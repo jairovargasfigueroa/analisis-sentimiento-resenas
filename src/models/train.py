@@ -17,7 +17,7 @@ from sklearn.pipeline import Pipeline
 from src.config import PARAMS, RUTA_METRICAS, RUTA_MODELO, SEED, TEST_SIZE
 from src.data.cargar import cargar_procesado
 from src.models.evaluacion import evaluar, evaluar_baseline
-from src.models.experimentos import buscar_hiperparametros, resumen_cv
+from src.models.experimentos import buscar_hiperparametros, experimentos, resumen_cv
 from src.nlp.preprocesador import TextPreprocessor
 
 # Nombre (el de params.yaml -> experiments.models) -> clasificador.
@@ -61,20 +61,24 @@ def entrenar():
     X_train, X_test, y_train, y_test = dividir(df)
 
     resultados = {"baseline": evaluar_baseline(X_train, y_train, X_test, y_test)}
-    modelos = {}
-    # Caché temporal compartida por los dos modelos: usan el mismo prep y tfidf.
+    busquedas = {}
+    # Caché temporal compartida por los dos modelos y los experimentos: usan el mismo prep y tfidf.
     with TemporaryDirectory() as memoria:
         for nombre, clf in CLASIFICADORES.items():
             pipeline = construir_pipeline(clf, memoria=memoria)
-            busqueda = buscar_hiperparametros(pipeline, nombre, X_train, y_train)
-            # Sin memoria antes de guardarlo: la carpeta temporal deja de existir al salir.
-            modelos[nombre] = busqueda.best_estimator_.set_params(memory=None)
-            resultados[nombre] = {**evaluar(modelos[nombre], X_test, y_test),
-                                  **resumen_cv(busqueda)}
-    return modelos, resultados, (df, X_train, X_test)
+            busquedas[nombre] = buscar_hiperparametros(pipeline, nombre, X_train, y_train)
+        mejor = max(busquedas, key=lambda n: busquedas[n].best_score_)
+        exps = experimentos(busquedas[mejor].best_estimator_, df, X_train, y_train)
+
+    modelos = {}
+    for nombre, busqueda in busquedas.items():
+        # Sin memoria antes de guardarlo: la carpeta temporal ya no existe.
+        modelos[nombre] = busqueda.best_estimator_.set_params(memory=None)
+        resultados[nombre] = {**evaluar(modelos[nombre], X_test, y_test), **resumen_cv(busqueda)}
+    return modelos, resultados, exps, (df, X_train, X_test)
 
 
-def guardar(modelos, resultados, datos) -> str:
+def guardar(modelos, resultados, exps, datos) -> str:
     """Guarda el modelo de producción y metricas.json (C6). Devuelve el nombre elegido."""
     df, X_train, X_test = datos
     # shortcut: elige por F1 en test porque aún no hay validación cruzada; el PR 2.2 la usa.
@@ -98,17 +102,20 @@ def guardar(modelos, resultados, datos) -> str:
             "max_df": tfidf.max_df, "max_features": tfidf.max_features,
         },
         "modelos": resultados,
+        "experimentos": exps,
     }
     RUTA_METRICAS.write_text(json.dumps(metricas, ensure_ascii=False, indent=2), encoding="utf-8")
     return elegido
 
 
 if __name__ == "__main__":
-    modelos, resultados, datos = entrenar()
+    modelos, resultados, exps, datos = entrenar()
     print(f"{'modelo':<22}{'f1_cv':>8}{'accuracy':>10}{'f1_test':>9}  hiperparámetros")
     for nombre, r in resultados.items():
         cv = f"{r['f1_cv_media']:.3f}" if "f1_cv_media" in r else "-"
         print(f"{nombre:<22}{cv:>8}{r['accuracy']:>10.3f}{r['f1_macro']:>9.3f}  "
               f"{r.get('mejores_hiperparametros', '')}")
-    elegido = guardar(modelos, resultados, datos)
+    for nombre, comparacion in exps.items():
+        print(f"{nombre}: " + ", ".join(f"{k} {v['f1_macro']:.3f}" for k, v in comparacion.items()))
+    elegido = guardar(modelos, resultados, exps, datos)
     print(f"Modelo en producción: {elegido} -> {RUTA_MODELO}")
