@@ -118,6 +118,7 @@ pytest -q
 |---|---|
 | `python3.12: command not found` (macOS) | `brew install python@3.12`, o con [uv](https://docs.astral.sh/uv/): `uv venv --python 3.12 .venv` |
 | `Resource stopwords not found` | `python -m nltk.downloader stopwords` con el entorno activado |
+| `DLL load failed … nombre del archivo o la extensión es demasiado largo` (Windows, al importar spaCy) | La ruta de la carpeta es demasiado larga para Windows (límite de 260 caracteres). Clona el repo en una ruta corta, por ejemplo `C:\proyectos\`, y vuelve a crear `.venv` |
 | La cabecera dice que no hay modelo (503) | Falta entrenar: `python -m src.models.train` y reiniciar uvicorn |
 | El frontend no conecta con la API | Revisa que uvicorn esté en el puerto 8000, o define `VITE_API_URL` (ver `frontend/.env.example`) |
 
@@ -142,6 +143,10 @@ Cambiar un valor de `params.yaml` y reentrenar (`python -m src.models.train --ra
 ## Datos
 
 *The Spanish Fake News Corpus* (Posadas-Durán et al., 2019; Gómez-Adorno et al., 2021), licencia CC BY 4.0. Detalle y cita en [`data/raw/README.md`](data/raw/README.md).
+
+## Presentación
+
+[`docs/presentacion.pdf`](docs/presentacion.pdf): 12 diapositivas más la portada. El guion de cada una está en [`docs/diapositivas/`](docs/diapositivas/) y el PDF se regenera desde `presentacion.html` (instrucciones en el propio archivo).
 
 ## Enunciado
 
