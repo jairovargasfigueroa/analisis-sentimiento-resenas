@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, Field
 
-from src.config import LONGITUD_MAX_TEXTO, MIN_PALABRAS_TEXTO
+from src.config import LONGITUD_MAX_TEXTO, MAX_TEXTOS_LOTE, MIN_PALABRAS_TEXTO
 
 EJEMPLO = (
     "El Ministerio de Salud informó este lunes que la campaña de vacunación contra la "
@@ -31,9 +31,42 @@ def validar_texto(texto: str) -> str:
     return texto
 
 
+def validar_lote(textos: list[str]) -> list[str]:
+    """Rechaza el lote entero si está vacío, es demasiado grande o alguna noticia no es válida.
+
+    El mensaje dice qué noticia falla ("Noticia 3: ...") para que se pueda corregir el archivo.
+    """
+    if not 1 <= len(textos) <= MAX_TEXTOS_LOTE:
+        raise ErrorAPI("LOTE_INVALIDO",
+                       f"El lote debe tener entre 1 y {MAX_TEXTOS_LOTE} noticias (tiene {len(textos)}).")
+    for i, texto in enumerate(textos, start=1):
+        try:
+            validar_texto(texto)
+        except ErrorAPI as e:
+            raise ErrorAPI("LOTE_INVALIDO", f"Noticia {i}: {e.mensaje}") from e
+    return textos
+
+
 class EntradaPrediccion(BaseModel):
     texto: str = Field(description="Noticia completa: titular y cuerpo.",
                        json_schema_extra={"example": EJEMPLO})
+
+
+class EntradaLote(BaseModel):
+    textos: list[str] = Field(description=f"Entre 1 y {MAX_TEXTOS_LOTE} noticias completas.",
+                              json_schema_extra={"example": [EJEMPLO, EJEMPLO]})
+
+
+class ResultadoLote(BaseModel):
+    texto: str
+    clase: str
+    probabilidad: float
+    probabilidades: dict[str, float]
+
+
+class PrediccionLote(BaseModel):
+    resultados: list[ResultadoLote]
+    resumen: dict[str, int] = Field(json_schema_extra={"example": {"falsa": 1, "verdadera": 1}})
 
 
 class Preprocesamiento(BaseModel):
