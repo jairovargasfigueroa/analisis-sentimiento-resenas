@@ -1,7 +1,7 @@
 """Entrenamiento: python -m src.models.train [--rapido] (spec 30, contrato C6).
 
 Va de data/raw a models/ sin pasos manuales: carga, split, entrena, evalúa y guarda.
-Completo tarda unos 7 minutos; --rapido salta los experimentos E1, E2 y E3.
+Completo tarda unos 80 s; --rapido (~45 s) salta los experimentos E1, E2 y E3.
 """
 
 import json
