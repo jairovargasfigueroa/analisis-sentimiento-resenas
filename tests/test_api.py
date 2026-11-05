@@ -109,3 +109,28 @@ def test_metrics_sin_entrenar_responde_503(cliente):
         assert r.status_code == 503 and codigo(r) == "MODELO_NO_DISPONIBLE"
     finally:
         app.state.metricas = guardado
+
+
+def test_lote_valido_devuelve_resultados_y_resumen(cliente):
+    r = cliente.post("/predict/lote", json={"textos": [NOTICIA] * 3})
+    assert r.status_code == 200
+    cuerpo = r.json()
+    assert len(cuerpo["resultados"]) == 3
+    assert set(cuerpo["resultados"][0]) == {"texto", "clase", "probabilidad", "probabilidades"}
+    assert sum(cuerpo["resumen"].values()) == 3
+
+
+@pytest.mark.parametrize("textos,fragmento", [
+    ([], "entre 1 y"),
+    ([NOTICIA] * 101, "entre 1 y"),
+    ([NOTICIA, "Noticia de solo cinco palabras"], "Noticia 2"),
+])
+def test_lote_invalido(cliente, textos, fragmento):
+    r = cliente.post("/predict/lote", json={"textos": textos})
+    assert r.status_code == 422 and codigo(r) == "LOTE_INVALIDO"
+    assert fragmento in r.json()["error"]["mensaje"]
+
+
+def test_lote_con_formato_incorrecto(cliente):
+    r = cliente.post("/predict/lote", json={"textos": "no es una lista"})
+    assert r.status_code == 422 and codigo(r) == "FORMATO_INVALIDO"

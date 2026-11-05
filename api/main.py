@@ -11,8 +11,9 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from api.esquemas import EntradaPrediccion, ErrorAPI, Estado, Prediccion, validar_texto
-from src.config import RUTA_METRICAS, RUTA_MODELO
+from api.esquemas import (EntradaLote, EntradaPrediccion, ErrorAPI, Estado, Prediccion,
+                          PrediccionLote, validar_lote, validar_texto)
+from src.config import ETIQUETAS, RUTA_METRICAS, RUTA_MODELO
 from src.models.predecir import cargar_modelo, predecir
 from src.nlp.explicar import explicar_preprocesamiento
 
@@ -55,7 +56,9 @@ async def manejar_error_api(request: Request, exc: ErrorAPI):
 @app.exception_handler(RequestValidationError)
 async def manejar_formato_invalido(request: Request, exc: RequestValidationError):
     # Reemplaza el error por defecto de FastAPI para usar el formato único de C8.
-    return error("FORMATO_INVALIDO", "El cuerpo debe ser un JSON con el campo 'texto' (string).", 422)
+    campo = ("'textos' (lista de strings)" if request.url.path.endswith("/lote")
+             else "'texto' (string)")
+    return error("FORMATO_INVALIDO", f"El cuerpo debe ser un JSON con el campo {campo}.", 422)
 
 
 def modelo_o_503(request: Request):
@@ -85,6 +88,21 @@ def predict(entrada: EntradaPrediccion, request: Request):
     resultado = predecir(modelo, [texto])[0]
     return {**resultado, "modelo": request.app.state.nombre_modelo,
             "preprocesamiento": explicar_preprocesamiento(texto, modelo.named_steps["prep"].modo)}
+
+
+@app.post("/predict/lote", response_model=PrediccionLote, summary="Clasificar varias noticias",
+          responses={422: {"description": "Lote vacío, demasiado grande o con una noticia inválida"},
+                     503: {"description": "Modelo no disponible"}})
+def predict_lote(entrada: EntradaLote, request: Request):
+    """Clasifica de 1 a MAX_TEXTOS_LOTE noticias en una sola llamada y resume cuántas hay por clase.
+
+    No devuelve el paso a paso (sería muy pesado): para eso está /predict con una noticia.
+    """
+    textos = validar_lote(entrada.textos)
+    modelo = modelo_o_503(request)
+    resultados = [{"texto": t, **r} for t, r in zip(textos, predecir(modelo, textos))]
+    resumen = {e: sum(r["clase"] == e for r in resultados) for e in ETIQUETAS}
+    return {"resultados": resultados, "resumen": resumen}
 
 
 @app.get("/metrics", summary="Métricas y comparación de los modelos",
