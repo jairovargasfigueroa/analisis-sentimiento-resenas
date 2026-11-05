@@ -118,6 +118,7 @@ pytest -q
 |---|---|
 | `python3.12: command not found` (macOS) | `brew install python@3.12`, o con [uv](https://docs.astral.sh/uv/): `uv venv --python 3.12 .venv` |
 | `Resource stopwords not found` | `python -m nltk.downloader stopwords` con el entorno activado |
+| `DLL load failed … nombre del archivo o la extensión es demasiado largo` (Windows, al importar spaCy) | La ruta de la carpeta es demasiado larga para Windows (límite de 260 caracteres). Clona el repo en una ruta corta, por ejemplo `C:\proyectos\`, y vuelve a crear `.venv` |
 | La cabecera dice que no hay modelo (503) | Falta entrenar: `python -m src.models.train` y reiniciar uvicorn |
 | El frontend no conecta con la API | Revisa que uvicorn esté en el puerto 8000, o define `VITE_API_URL` (ver `frontend/.env.example`) |
 
