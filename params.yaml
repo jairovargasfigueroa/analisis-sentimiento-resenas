@@ -20,8 +20,9 @@ nlp:
   # "no hay vacuna" y "hay vacuna" afirman cosas opuestas. Escribirlas sin tildes.
   # "no" va entre comillas: sin ellas YAML lo lee como el booleano false.
   conservar: ["no", ni, nunca, sin, tampoco]
-  # Palabras del dominio que se AGREGAN como stop words (se completan según la EDA).
-  agregar: []
+  # Firmas de agencia que se AGREGAN como stop words: dicen quién escribe, no qué dice
+  # la noticia, y casi solo aparecen en verdaderas ("bbc": 26 vs 0). Ver notebooks/01_eda.ipynb, sección 9.
+  agregar: [bbc, afp, efe, reuters, notimex]
   modo: lema               # modelo de producción: lema | stem | ninguno (E1 los compara)
 
 tfidf:
