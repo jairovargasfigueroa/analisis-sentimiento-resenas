@@ -135,3 +135,11 @@ code { background: var(--chip); border-radius: 4px; padding: 0 4px; font-size: 1
 .etiqueta { font-size: 12px; font-weight: 600; border-radius: 999px; padding: 1px 8px; }
 .etiqueta.falsa { background: var(--falsa-suave); color: var(--falsa); }
 .etiqueta.verdadera { background: var(--verdadera-suave); color: var(--verdadera); }
+
+/* Pestaña Lote */
+input[type="file"] { font: inherit; color: var(--texto); }
+.resumen-lote { display: flex; gap: 8px; flex-wrap: wrap; }
+.barra.apilada { display: flex; height: 14px; margin: 8px 0 12px; }
+.barra.apilada div.falsa { background: var(--falsa); }
+.barra.apilada div.verdadera { background: var(--verdadera); }
+.tabla.lote td.texto-corto { text-align: left; white-space: normal; min-width: 260px; }

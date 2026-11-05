@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { predecirLote } from "../api.js";
 import { leerNoticias } from "../leerArchivo.js";
+import ResultadosLote from "./ResultadosLote.jsx";
 
 // El mismo límite que params.yaml -> api.max_textos_lote (la API vuelve a validarlo).
 const MAX_NOTICIAS = 100;
@@ -45,6 +46,7 @@ export default function Lote() {
   }
 
   return (
+    <>
     <section className="tarjeta">
       <h2>Analizar varias noticias</h2>
       <p className="contador">
@@ -60,7 +62,8 @@ export default function Lote() {
         </button>
       </div>
       {error && <p className="error" role="alert">{error}</p>}
-      {respuesta && <p className="contador">{respuesta.resultados.length} noticias analizadas.</p>}
     </section>
+    {respuesta && <ResultadosLote respuesta={respuesta} />}
+    </>
   );
 }
