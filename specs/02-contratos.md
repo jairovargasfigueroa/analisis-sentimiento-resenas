@@ -75,7 +75,7 @@ class TextPreprocessor(BaseEstimator, TransformerMixin):
     #   cada texto -> normalizar -> tokenizar -> quitar_stopwords -> stemizar/lematizar -> quitar_tildes -> " ".join(...)
 ```
 
-- Debe poder **serializarse con joblib**: el modelo de spaCy se carga de forma perezosa y no se guarda dentro del pickle (se excluye en `__getstate__`).
+- Debe poder **serializarse con joblib**: el modelo de spaCy se carga de forma perezosa y vive como variable del módulo `raices.py`, no en el objeto, así que no entra al pickle.
 - `TfidfVectorizer` recibe ese texto ya procesado.
 
 ## C5 · Explicación paso a paso (`src/nlp/explicar.py`), de Brayan
