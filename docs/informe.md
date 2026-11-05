@@ -1,7 +1,7 @@
 # Informe técnico · Detector de Noticias Falsas en Español
 
 Proyecto Integrador · Primer Parcial · *Tópicos y Programación Avanzada*.
-Integrantes: Brayan Albaro Garcia Taboada (@Alba-Tab) y Jairo Vargas Figueroa (@jairovargasfigueroa).
+Integrantes: Brayan Albaro Garcia Taboada (@Alba-Tab) y Jairo Moises Vargas Figueroa (@jairovargasfigueroa).
 
 | Sección | Autor |
 |---|---|

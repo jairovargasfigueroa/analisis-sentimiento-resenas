@@ -17,7 +17,7 @@ Cada integrante completa **su propia sección** en su propio commit. Esta inform
 
 **Parte de NLP/ML:** normalización con señales de estilo (exclamaciones, emojis, cifras), stop words con las negaciones conservadas, stemming y lematización (y por qué las tildes se quitan al final), `TextPreprocessor` serializable y `explicar_preprocesamiento()`; split estratificado, línea base y Regresión Logística; y la detección de dos diferencias de formato entre versiones del corpus (titular repetido y marcadores `*NUMBER*`) que inflaban el F1.
 
-## Jairo Vargas Figueroa (@jairovargasfigueroa)
+## Jairo Moises Vargas Figueroa (@jairovargasfigueroa)
 
 **Parte 2 · Análisis y métricas** · Specs 10 (EDA), 30 (comparación), 40 (`/metrics`), 50 (Métricas)
 
