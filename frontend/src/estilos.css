@@ -100,3 +100,17 @@ button.ejemplo {
 .chips { display: flex; flex-wrap: wrap; gap: 4px; }
 .chips span { background: var(--chip); border-radius: 6px; padding: 1px 6px; font-size: 13px; }
 .chips span.quitada { text-decoration: line-through; color: var(--tachado); }
+
+/* Pestaña Métricas */
+.subtitulo { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--texto-suave); margin: 16px 0 8px; }
+.tabla-scroll { overflow-x: auto; }
+.tabla { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.tabla th, .tabla td { padding: 6px 8px; border-bottom: 1px solid var(--borde); text-align: right; white-space: nowrap; }
+.tabla th:first-child, .tabla td:first-child { text-align: left; }
+.tabla th { color: var(--texto-suave); font-weight: 600; font-size: 13px; }
+.tabla tr.destacada td { font-weight: 600; }
+.barra-fila { display: grid; grid-template-columns: 150px 1fr 64px; align-items: center; gap: 8px; font-size: 14px; }
+.barra-fila .barra { margin: 4px 0; }
+.barra-fila .barra div { background: var(--tachado); }
+.barra-fila .barra div.prod { background: var(--acento); }
+.barra-fila span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
