@@ -1,11 +1,13 @@
 import { useState } from "react";
 import Cabecera from "./components/Cabecera.jsx";
 import Analizar from "./components/Analizar.jsx";
+import Lote from "./components/Lote.jsx";
 import Metricas from "./components/Metricas.jsx";
 
 // Para agregar una pestaña basta sumar una línea aquí.
 const PESTANAS = [
   { id: "analizar", nombre: "Analizar", Componente: Analizar },
+  { id: "lote", nombre: "Lote", Componente: Lote },
   { id: "metricas", nombre: "Métricas", Componente: Metricas },
 ];
 

@@ -27,3 +27,10 @@ export const predecir = (texto) =>
   });
 
 export const metricas = () => pedir("/metrics");
+
+export const predecirLote = (textos) =>
+  pedir("/predict/lote", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ textos }),
+  });
