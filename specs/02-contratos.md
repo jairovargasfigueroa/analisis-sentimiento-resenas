@@ -111,7 +111,8 @@ El PR 1.3 genera `metricas.json` con `modelo_produccion`, `dataset`, `preprocesa
 ```json
 {
   "modelo_produccion": "regresion_logistica",
-  "justificacion": "Mayor F1 macro en validación cruzada y probabilidades mejor calibradas.",
+  "criterio": "mayor F1 macro en validación cruzada (5 particiones, solo train)",
+  "justificacion": "Mayor F1 macro en validación cruzada: 0.766 ± 0.006 frente a naive bayes (0.695). …",
   "fecha_entrenamiento": "2026-11-01T18:30:00",
   "dataset": {
     "nombre": "The Spanish Fake News Corpus", "n_total": 1543, "n_train": 1234, "n_test": 309,
@@ -126,22 +127,32 @@ El PR 1.3 genera `metricas.json` con `modelo_produccion`, `dataset`, `preprocesa
     "regresion_logistica": {
       "accuracy": 0.82, "precision_macro": 0.82, "recall_macro": 0.82, "f1_macro": 0.82,
       "matriz_confusion": [[125, 28], [27, 129]], "etiquetas": ["falsa", "verdadera"],
+      "por_clase": {"falsa": {"precision": 0.82, "recall": 0.82, "f1": 0.82, "soporte": 153}, "verdadera": {"…": ""}},
       "mejores_hiperparametros": {"clf__C": 10.0}, "f1_cv_media": 0.81, "f1_cv_std": 0.02
     },
     "naive_bayes": { "…mismos campos…": "" }
   },
   "experimentos": {
-    "stem_vs_lema": {"stem": {"f1_macro": 0.80}, "lema": {"f1_macro": 0.81}},
-    "ngramas": {"(1,1)": {"f1_macro": 0.80}, "(1,2)": {"f1_macro": 0.82}},
-    "temporal": {"2018 -> 2020-21": {"f1_macro": 0.70}}
+    "stem_vs_lema": {"stem": {"f1_macro": 0.80, "f1_std": 0.01}, "lema": {"f1_macro": 0.81, "f1_std": 0.01}},
+    "ngramas": {"(1,1)": {"f1_macro": 0.80, "f1_std": 0.02}, "(1,2)": {"f1_macro": 0.82, "f1_std": 0.01}},
+    "temporal": {"2018 -> 2020-21": {"accuracy": 0.66, "f1_macro": 0.64, "n_train": 970, "n_test": 572}}
+  },
+  "palabras_influyentes": {
+    "falsa": [{"termino": "exclamacion", "peso": -1.9}],
+    "verdadera": [{"termino": "indicar", "peso": 2.1}]
   },
   "errores_ejemplo": [
-    {"texto": "…", "real": "falsa", "predicho": "verdadera", "probabilidad": 0.71, "explicacion": "sátira con estilo periodístico"}
+    {"texto": "… (primeros 400 caracteres)", "real": "falsa", "predicho": "verdadera", "probabilidad": 0.91,
+     "tema": "Política", "fuente": "El Ruinaversal", "anio": 2018}
   ]
 }
 ```
 
-Los números son de ejemplo. Los nombres de los campos son el contrato. `experimentos.temporal` es opcional (E3).
+Los números son de ejemplo. Los nombres de los campos son el contrato.
+
+- Los `f1_macro` de `experimentos` son de **validación cruzada en train** (E1 y E2); el de `temporal` (E3) es de entrenar con 2018 y probar con 2020-21.
+- `palabras_influyentes`: los 15 términos con más peso hacia cada clase en el modelo de producción.
+- `errores_ejemplo`: los 10 errores en que el modelo estaba más seguro, en el conjunto de prueba. La **explicación** de cada uno va en el notebook y en el informe (sección 6), no en el JSON, porque depende de leer la noticia.
 
 ## C7 · Predicción en Python (`src/models/predecir.py`), de Brayan
 

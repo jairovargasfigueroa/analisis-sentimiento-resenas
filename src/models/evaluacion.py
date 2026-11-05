@@ -52,3 +52,21 @@ def analizar_errores(modelo, X, y, n=10) -> list[dict]:
             errores.append({"indice": i, "real": real, "predicho": predicho,
                             "probabilidad": round(float(fila.max()), 4)})
     return sorted(errores, key=lambda e: e["probabilidad"], reverse=True)[:n]
+
+
+def palabras_influyentes(modelo, n=15) -> dict:
+    """Los n términos (palabras o bigramas lematizados) que más empujan hacia cada clase.
+
+    Regresión Logística: el coeficiente de cada término (positivo -> classes_[1]).
+    Naive Bayes: la diferencia de log-probabilidad del término entre las dos clases.
+    """
+    vocabulario = modelo.named_steps["tfidf"].get_feature_names_out()
+    clf = modelo.named_steps["clf"]
+    if hasattr(clf, "coef_"):
+        pesos = clf.coef_[0]
+    else:
+        pesos = clf.feature_log_prob_[1] - clf.feature_log_prob_[0]
+    orden = pesos.argsort()
+    lista = lambda indices: [{"termino": vocabulario[i], "peso": round(float(pesos[i]), 3)}
+                             for i in indices]
+    return {clf.classes_[0]: lista(orden[:n]), clf.classes_[1]: lista(orden[::-1][:n])}

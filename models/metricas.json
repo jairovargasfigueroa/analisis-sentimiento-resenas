@@ -1,0 +1,388 @@
+{
+  "modelo_produccion": "regresion_logistica",
+  "criterio": "mayor F1 macro en validación cruzada (5 particiones, solo train)",
+  "justificacion": "Mayor F1 macro en validación cruzada: 0.766 ± 0.006 frente a naive bayes (0.695). En prueba obtiene 0.773, contra 0.336 de la línea base.",
+  "fecha_entrenamiento": "2026-11-04T22:02:44",
+  "dataset": {
+    "nombre": "The Spanish Fake News Corpus",
+    "n_total": 1542,
+    "n_train": 1233,
+    "n_test": 309,
+    "distribucion_clases": {
+      "verdadera": 777,
+      "falsa": 765
+    }
+  },
+  "preprocesamiento": {
+    "modo": "lema",
+    "ngram_range": [
+      1,
+      2
+    ],
+    "min_df": 2,
+    "max_df": 0.9,
+    "max_features": 20000
+  },
+  "modelos": {
+    "baseline": {
+      "accuracy": 0.5049,
+      "precision_macro": 0.2524,
+      "recall_macro": 0.5,
+      "f1_macro": 0.3355,
+      "matriz_confusion": [
+        [
+          0,
+          153
+        ],
+        [
+          0,
+          156
+        ]
+      ],
+      "etiquetas": [
+        "falsa",
+        "verdadera"
+      ],
+      "por_clase": {
+        "falsa": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "soporte": 153
+        },
+        "verdadera": {
+          "precision": 0.5049,
+          "recall": 1.0,
+          "f1": 0.671,
+          "soporte": 156
+        }
+      }
+    },
+    "regresion_logistica": {
+      "accuracy": 0.7735,
+      "precision_macro": 0.7736,
+      "recall_macro": 0.7733,
+      "f1_macro": 0.7733,
+      "matriz_confusion": [
+        [
+          116,
+          37
+        ],
+        [
+          33,
+          123
+        ]
+      ],
+      "etiquetas": [
+        "falsa",
+        "verdadera"
+      ],
+      "por_clase": {
+        "falsa": {
+          "precision": 0.7785,
+          "recall": 0.7582,
+          "f1": 0.7682,
+          "soporte": 153
+        },
+        "verdadera": {
+          "precision": 0.7688,
+          "recall": 0.7885,
+          "f1": 0.7785,
+          "soporte": 156
+        }
+      },
+      "mejores_hiperparametros": {
+        "clf__C": 10.0
+      },
+      "f1_cv_media": 0.7663,
+      "f1_cv_std": 0.0063
+    },
+    "naive_bayes": {
+      "accuracy": 0.7346,
+      "precision_macro": 0.7438,
+      "recall_macro": 0.7337,
+      "f1_macro": 0.7316,
+      "matriz_confusion": [
+        [
+          97,
+          56
+        ],
+        [
+          26,
+          130
+        ]
+      ],
+      "etiquetas": [
+        "falsa",
+        "verdadera"
+      ],
+      "por_clase": {
+        "falsa": {
+          "precision": 0.7886,
+          "recall": 0.634,
+          "f1": 0.7029,
+          "soporte": 153
+        },
+        "verdadera": {
+          "precision": 0.6989,
+          "recall": 0.8333,
+          "f1": 0.7602,
+          "soporte": 156
+        }
+      },
+      "mejores_hiperparametros": {
+        "clf__alpha": 0.1
+      },
+      "f1_cv_media": 0.695,
+      "f1_cv_std": 0.0236
+    }
+  },
+  "experimentos": {
+    "stem_vs_lema": {
+      "stem": {
+        "f1_macro": 0.7658,
+        "f1_std": 0.0149
+      },
+      "lema": {
+        "f1_macro": 0.7663,
+        "f1_std": 0.0063
+      }
+    },
+    "ngramas": {
+      "(1,1)": {
+        "f1_macro": 0.7602,
+        "f1_std": 0.0198
+      },
+      "(1,2)": {
+        "f1_macro": 0.7663,
+        "f1_std": 0.0063
+      }
+    },
+    "temporal": {
+      "2018 -> 2020-21": {
+        "accuracy": 0.6591,
+        "f1_macro": 0.6431,
+        "n_train": 970,
+        "n_test": 572
+      }
+    }
+  },
+  "palabras_influyentes": {
+    "falsa": [
+      {
+        "termino": "revelar",
+        "peso": -3.164
+      },
+      {
+        "termino": "exclamacion",
+        "peso": -3.161
+      },
+      {
+        "termino": "no",
+        "peso": -2.615
+      },
+      {
+        "termino": "pues",
+        "peso": -2.451
+      },
+      {
+        "termino": "virus",
+        "peso": -2.426
+      },
+      {
+        "termino": "amlo",
+        "peso": -2.363
+      },
+      {
+        "termino": "poner",
+        "peso": -2.249
+      },
+      {
+        "termino": "feminista",
+        "peso": -2.235
+      },
+      {
+        "termino": "poder",
+        "peso": -2.215
+      },
+      {
+        "termino": "pueblo",
+        "peso": -2.168
+      },
+      {
+        "termino": "gente",
+        "peso": -2.133
+      },
+      {
+        "termino": "nadie",
+        "peso": -2.104
+      },
+      {
+        "termino": "decidir",
+        "peso": -2.094
+      },
+      {
+        "termino": "esperar",
+        "peso": -2.078
+      },
+      {
+        "termino": "decidido",
+        "peso": -2.026
+      }
+    ],
+    "verdadera": [
+      {
+        "termino": "dos",
+        "peso": 3.224
+      },
+      {
+        "termino": "mensaje",
+        "peso": 2.945
+      },
+      {
+        "termino": "centro",
+        "peso": 2.802
+      },
+      {
+        "termino": "num",
+        "peso": 2.63
+      },
+      {
+        "termino": "pasado",
+        "peso": 2.617
+      },
+      {
+        "termino": "junto",
+        "peso": 2.468
+      },
+      {
+        "termino": "cinco",
+        "peso": 2.466
+      },
+      {
+        "termino": "publico",
+        "peso": 2.427
+      },
+      {
+        "termino": "proceso",
+        "peso": 2.408
+      },
+      {
+        "termino": "martes",
+        "peso": 2.309
+      },
+      {
+        "termino": "frente",
+        "peso": 2.305
+      },
+      {
+        "termino": "año",
+        "peso": 2.283
+      },
+      {
+        "termino": "evento",
+        "peso": 2.282
+      },
+      {
+        "termino": "lunes",
+        "peso": 2.276
+      },
+      {
+        "termino": "francisco",
+        "peso": 2.273
+      }
+    ]
+  },
+  "errores_ejemplo": [
+    {
+      "texto": "Exvicepresidente de Pﬁzer: \"No hay necesidad de vacunas, la pandemia ha terminado\". Si bien la farmacéutica Pﬁzer llegó a los titulares al anunciar el lanzamiento inminente de su vacuna COVID-19, con mucha \"fanfarria\", un exvicepresidente y cientíﬁco jefe de la compañía ha rechazado rotundamente la necesidad de cualquier vacuna para poner ﬁn a la pandemia de la COVID-19.\n\nEn un Noticia reciente, e",
+      "real": "falsa",
+      "predicho": "verdadera",
+      "probabilidad": 0.9336,
+      "tema": "Covid-19",
+      "fuente": "La comarca de Puerto Llano",
+      "anio": 2021
+    },
+    {
+      "texto": "Forbes afirma que Angélica Rivera está ya en la lista de mexicanos millonarios en EU\nLa Primera Dama de México, Angélica Rivera Hurtado está en la lista de \"millonarios\" mexicanos que tienen propiedades de lujo en Estados Unidos, según una nota de Forbes basada en una columna de Dolia Estevez.\nRivera Hurtado posee un condominio de lujo frente al mar en Key Biscayne, Florida con un valor estimado d",
+      "real": "falsa",
+      "predicho": "verdadera",
+      "probabilidad": 0.9032,
+      "tema": "Politics",
+      "fuente": "Sin embargo",
+      "anio": 2018
+    },
+    {
+      "texto": "Papelón: La diputada Ocasio-Cortez afirmó que su vida corrió peligro durante las protestas en el Capitolio pero se descubrió que ni siquiera estaba en el edificio. Durante las protestas que se desataron frente al Capitolio el pasado 6 de enero de 2021, en medio de las manifestaciones de los seguidores del ex presidente Donald Trump por el reconocimiento del fraude electoral de las últimas eleccion",
+      "real": "falsa",
+      "predicho": "verdadera",
+      "probabilidad": 0.8825,
+      "tema": "Covid-19",
+      "fuente": "AFPFactual",
+      "anio": 2021
+    },
+    {
+      "texto": "Líder religioso que culpó a los homosexuales del coronavirus dio positivo al covid-19. El patriarca de la Iglesia ortodoxa de Ucrania, Patriarca Filaret (Mykhailo Denysenko) ingresó al hospital por neumonía, luego de haber dado positivo al coronavirus, covid-19. La noticia ha generado controversia en redes sociales, pues la figura religiosa fue polémica hace unos meses al decir que la pandemia por",
+      "real": "verdadera",
+      "predicho": "falsa",
+      "probabilidad": 0.8378,
+      "tema": "Sociedad",
+      "fuente": "Milenio",
+      "anio": 2021
+    },
+    {
+      "texto": "Cali completó 48 horas con cero homicidios. “Ese es el mensaje que queremos darle al país y ojalá pudiéramos tener muchos días del año con cero homicidios porque tenemos derecho a la vida, a protegernos, a trabajar y a gozar de un bienestar como caleños y caleñas que somos”.\n\nAsí se expresó el secretario de Seguridad y Justicia de Santiago de Cali, Carlos Alberto Rojas Cruz, tras el operativo de c",
+      "real": "falsa",
+      "predicho": "verdadera",
+      "probabilidad": 0.8342,
+      "tema": "Sociedad",
+      "fuente": "Gov",
+      "anio": 2021
+    },
+    {
+      "texto": "Feministas protestan frente a Palacio Nacional contra candidatura de Félix Salgado Macedonio. A unas horas que Félix Salgado Macedonio sea registrado como candidato de Morena a la gubernatura de Guerrero, integrantes de Colectivo Nacional Feminista realizaron un performance frente a Palacio Nacional para mostrar su rechazo, pues aseguraron que sobre él pesan acusaciones de violación sexual. \n\nAl r",
+      "real": "verdadera",
+      "predicho": "falsa",
+      "probabilidad": 0.8213,
+      "tema": "Sociedad",
+      "fuente": "El Universal",
+      "anio": 2021
+    },
+    {
+      "texto": "Queman la sede del PRI municipal en Veracruz.\nA través de redes sociales, el presidente del Comité Municipal del Partido Revolucionario Institucional (PRI)\nen el puerto de Veracruz, Raúl Díaz Diez, denunció un supuesto ataque contra las instalaciones de dicho instituto político. \"Hace unos momentos sujetos desconocidos atentaron contra la sede de nuestro partido. No hay lesionados!\", difundió en s",
+      "real": "falsa",
+      "predicho": "verdadera",
+      "probabilidad": 0.8195,
+      "tema": "Security",
+      "fuente": "La otra opinion",
+      "anio": 2018
+    },
+    {
+      "texto": "Messi: \"Todavía estoy a tiempo de jugar con la selección española\"\n En una entrevista aparecida hoy en el diario Sport de Barcelona, el astro argentino se sincera y asegura que se nacionalizaría español si le permitieran jugar en la selección española.\nUno de los retos que le quedan al mejor jugador de la historia del fútbol moderno, Leo Messi, es ganar una copa del mundo de fútbol. Sin embargo Me",
+      "real": "falsa",
+      "predicho": "verdadera",
+      "probabilidad": 0.8044,
+      "tema": "Sport",
+      "fuente": "Hay noticia",
+      "anio": 2018
+    },
+    {
+      "texto": "Marchesín es intransferible, aclara el América\nSantiago Baños, presidente deportivo del equipo azulcrema, aseguró que no piensan prescindir de los servicios del guardameta argentino\nCIUDAD DE MÉXICO\nEl presidente deportivo del América, Santiago Baños, refrendó el compromiso que tiene el equipo americanista con su portero, el argentino Agustín Marchesín, a quien no piensan transferir en mucho tiemp",
+      "real": "verdadera",
+      "predicho": "falsa",
+      "probabilidad": 0.803,
+      "tema": "Sport",
+      "fuente": "Excelsior",
+      "anio": 2018
+    },
+    {
+      "texto": "La Unión Europea podría prohibir los kebabs por sus riesgos para la salud\nEsta comida, originaria de Turquía, podría ser prohibida debido a sus vínculos con enfermedades cardiovasculares\nAnte el revuelo generado por esta noticia, desde Prensa de la Comisión Europea en español han desmentido que se vaya a prohibir la venta\nLos amantes del kebab tienen que preocuparse, pues pronto podrían dejar de c",
+      "real": "falsa",
+      "predicho": "verdadera",
+      "probabilidad": 0.7739,
+      "tema": "Health",
+      "fuente": "ABC sociedad",
+      "anio": 2018
+    }
+  ]
+}

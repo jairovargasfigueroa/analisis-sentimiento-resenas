@@ -16,7 +16,8 @@ from sklearn.pipeline import Pipeline
 
 from src.config import PARAMS, RUTA_METRICAS, RUTA_MODELO, SEED, TEST_SIZE
 from src.data.cargar import cargar_procesado
-from src.models.evaluacion import evaluar, evaluar_baseline
+from src.models.evaluacion import (analizar_errores, evaluar, evaluar_baseline,
+                                   palabras_influyentes)
 from src.models.experimentos import buscar_hiperparametros, experimentos, resumen_cv
 from src.nlp.preprocesador import TextPreprocessor
 
@@ -53,7 +54,9 @@ def construir_pipeline(clf, modo=None, ngram_range=None, memoria=None) -> Pipeli
 
 
 def entrenar():
-    """Línea base y GridSearchCV de cada clasificador; devuelve (modelos, resultados, datos).
+    """Línea base, GridSearchCV de cada clasificador y experimentos.
+
+    Devuelve (modelos, resultados, experimentos, datos).
 
     Los hiperparámetros se eligen con validación cruzada en train; test solo se reporta.
     """
@@ -75,22 +78,51 @@ def entrenar():
         # Sin memoria antes de guardarlo: la carpeta temporal ya no existe.
         modelos[nombre] = busqueda.best_estimator_.set_params(memory=None)
         resultados[nombre] = {**evaluar(modelos[nombre], X_test, y_test), **resumen_cv(busqueda)}
-    return modelos, resultados, exps, (df, X_train, X_test)
+    return modelos, resultados, exps, (df, X_train, X_test, y_test)
+
+
+def elegir(resultados) -> str:
+    """El modelo con mayor F1 macro de validación cruzada. El de test no participa:
+    si se eligiera por test, el test dejaría de ser una medición independiente."""
+    candidatos = [n for n in resultados if "f1_cv_media" in resultados[n]]
+    return max(candidatos, key=lambda n: resultados[n]["f1_cv_media"])
+
+
+def justificar(elegido, resultados) -> str:
+    r = resultados[elegido]
+    otros = [f"{n.replace('_', ' ')} ({resultados[n]['f1_cv_media']:.3f})"
+             for n in resultados if n not in ("baseline", elegido)]
+    return (f"Mayor F1 macro en validación cruzada: {r['f1_cv_media']:.3f} ± {r['f1_cv_std']:.3f} "
+            f"frente a {', '.join(otros)}. En prueba obtiene {r['f1_macro']:.3f}, contra "
+            f"{resultados['baseline']['f1_macro']:.3f} de la línea base.")
+
+
+def errores_ejemplo(modelo, df, X_test, y_test, n=10) -> list[dict]:
+    """Los errores más seguros del modelo, con tema, fuente y año para poder explicarlos."""
+    filas = df.set_index("texto")  # los textos son únicos: cargar.py quita duplicados
+    ejemplos = []
+    for e in analizar_errores(modelo, X_test, y_test, n):
+        texto = X_test[e.pop("indice")]
+        fila = filas.loc[texto]
+        ejemplos.append({"texto": texto[:400], **e, "tema": fila["tema"],
+                         "fuente": fila["fuente"], "anio": int(fila["anio"])})
+    return ejemplos
 
 
 def guardar(modelos, resultados, exps, datos) -> str:
     """Guarda el modelo de producción y metricas.json (C6). Devuelve el nombre elegido."""
-    df, X_train, X_test = datos
-    # shortcut: elige por F1 en test porque aún no hay validación cruzada; el PR 2.2 la usa.
-    elegido = max(modelos, key=lambda n: resultados[n]["f1_macro"])
+    df, X_train, X_test, y_test = datos
+    elegido = elegir(resultados)
+    modelo = modelos[elegido]
     RUTA_MODELO.parent.mkdir(parents=True, exist_ok=True)
-    joblib.dump(modelos[elegido], RUTA_MODELO)
+    joblib.dump(modelo, RUTA_MODELO)
 
-    prep = modelos[elegido].named_steps["prep"]
-    tfidf = modelos[elegido].named_steps["tfidf"]
+    prep = modelo.named_steps["prep"]
+    tfidf = modelo.named_steps["tfidf"]
     metricas = {
         "modelo_produccion": elegido,
-        "justificacion": "Único modelo entrenado por ahora; supera ampliamente a la línea base.",
+        "criterio": "mayor F1 macro en validación cruzada (5 particiones, solo train)",
+        "justificacion": justificar(elegido, resultados),
         "fecha_entrenamiento": datetime.now().isoformat(timespec="seconds"),
         "dataset": {
             "nombre": "The Spanish Fake News Corpus",
@@ -103,6 +135,8 @@ def guardar(modelos, resultados, exps, datos) -> str:
         },
         "modelos": resultados,
         "experimentos": exps,
+        "palabras_influyentes": palabras_influyentes(modelo),
+        "errores_ejemplo": errores_ejemplo(modelo, df, X_test, y_test),
     }
     RUTA_METRICAS.write_text(json.dumps(metricas, ensure_ascii=False, indent=2), encoding="utf-8")
     return elegido
