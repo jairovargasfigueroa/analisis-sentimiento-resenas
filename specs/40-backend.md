@@ -37,7 +37,7 @@ Para no bloquearse, se puede entrenar un modelo de prueba pequeño con datos inv
 
 - [ ] Texto vacío o solo espacios → `TEXTO_VACIO`.
 - [ ] Menos de `MIN_PALABRAS_TEXTO` palabras → `TEXTO_DEMASIADO_CORTO`.
-- [ ] Más de `LONGITUD_MAX_TEXTO` caracteres → `TEXTO_DEMASIADO_LARGO` (20.000: la noticia más larga del corpus tiene 2.566 palabras; se justifica con la EDA).
+- [ ] Más de `LONGITUD_MAX_TEXTO` caracteres → `TEXTO_DEMASIADO_LARGO` (20.000: el 99,5 % de las noticias del corpus mide menos de 13.600 caracteres y solo 2 de 1.542 lo superan; se justifica con la EDA).
 - [ ] JSON mal formado, campo faltante o tipo incorrecto → `FORMATO_INVALIDO`. Se sobrescribe el manejador de `RequestValidationError` para usar el formato propio.
 - [ ] Lote vacío o mayor a `MAX_TEXTOS_LOTE` → `LOTE_INVALIDO`.
 

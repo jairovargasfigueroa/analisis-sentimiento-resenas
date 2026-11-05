@@ -18,7 +18,7 @@ Dejar el corpus de noticias limpio con el formato C2 y hacer la EDA que pide el 
 | `train.xlsx` + `development.xlsx` (v1) | ene–jul 2018 | 971 | 491 / 480 | Política, Entretenimiento, Sociedad, Deporte, Ciencia |
 | `test.xlsx` (v2) | nov 2020–mar 2021 | 572 | 286 / 286 | COVID-19, Sociedad, Política |
 
-Columnas originales: `Id`, `Category`, `Topic`, `Source`, `Headline`, `Text`, `Link`. Mediana de unas 315 palabras en v1 y 400 en v2 (máximo 2.566). Incluye fuentes de varios países de habla hispana, también Bolivia.
+Columnas originales: `Id`, `Category`, `Topic`, `Source`, `Headline`, `Text`, `Link`. Mediana de unas 315 palabras en v1 y 400 en v2 (máximo 2.574 en v1 y 4.017 en v2; la más larga, con titular, tiene 25.872 caracteres). Incluye fuentes de varios países de habla hispana, también Bolivia.
 
 Documentar en `data/raw/README.md`: **nombre, URL, licencia, fecha de obtención, número de registros y columnas originales**.
 
@@ -34,7 +34,7 @@ Cuidados (si no se hacen, las métricas salen absurdas):
 
 - La v2 trae los encabezados en mayúsculas (`CATEGORY`, `TOPICS`, …): se unifican los nombres de columna.
 - La etiqueta falsa viene como `Fake` en v1 y como `False` en v2. Se mapea a `falsa` / `verdadera` (`True` → `verdadera`).
-- `texto = Headline + ". " + Text`. Algunas noticias de la v2 no tienen titular: en ese caso, solo `Text`.
+- `texto = Headline + ". " + Text`. Algunas noticias de la v2 no tienen titular: en ese caso, solo `Text`. En la v1, el `Text` ya empieza con el titular (943 de 971): tampoco se repite.
 - `anio`: 2018 para v1; para v2 el año de la noticia (2020 o 2021) si se puede, si no 2021.
 - La columna `Source` se guarda como `fuente`, pero **no entra al modelo**: hay sitios satíricos (El Dizque, El Ruinaversal) que solo aparecen como falsos. Usarla sería hacer trampa.
 - Eliminar filas con texto vacío y **duplicados exactos**. Reportar cuántas se eliminaron.
