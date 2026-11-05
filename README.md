@@ -42,8 +42,8 @@ Requisitos: **Python 3.12**, **Node 18 o superior** y Git. Todos los comandos se
 ### 1. Clonar
 
 ```bash
-git clone https://github.com/jairovargasfigueroa/analisis-sentimiento-resenas.git
-cd analisis-sentimiento-resenas
+git clone https://github.com/jairovargasfigueroa/detector-noticias-falsas.git
+cd detector-noticias-falsas
 ```
 
 ### 2. Entorno de Python
@@ -146,7 +146,7 @@ Cambiar un valor de `params.yaml` y reentrenar (`python -m src.models.train --ra
 
 ## Presentación
 
-[`docs/presentacion.pdf`](docs/presentacion.pdf): 12 diapositivas más la portada. El guion de cada una está en [`docs/diapositivas/`](docs/diapositivas/) y el PDF se regenera desde `presentacion.html` (instrucciones en el propio archivo).
+[`docs/presentacion.pdf`](docs/presentacion.pdf): 11 diapositivas más la portada. El guion de cada una está en [`docs/diapositivas/`](docs/diapositivas/) y el PDF se regenera desde `presentacion.html` (instrucciones en el propio archivo).
 
 ## Enunciado
 

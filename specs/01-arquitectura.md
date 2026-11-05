@@ -38,7 +38,7 @@ frontend (React) ──HTTP/JSON──► api (FastAPI) ──joblib.load──�
 ## Estructura de carpetas y responsables
 
 ```
-analisis-sentimiento-resenas/
+detector-noticias-falsas/
 ├── data/
 │   ├── raw/                 # corpus original (.xlsx) y su README                → Brayan
 │   └── processed/           # noticias.csv (C2)                                  → Brayan

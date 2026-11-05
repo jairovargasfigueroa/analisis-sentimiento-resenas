@@ -14,7 +14,7 @@ Haz esto tú mismo, sin esperar a que el integrante lo pida:
    | Integrante | Usuario GitHub | Parte |
    |---|---|---|
    | Brayan Albaro Garcia Taboada | Alba-Tab | Parte 1 · Predicción (PRs 1.0–1.6, 3.1, 3.2) |
-   | Jairo Vargas Figueroa | jairovargasfigueroa | Parte 2 · Análisis y métricas (PRs 2.1–2.3, 3.3) |
+   | Jairo Moises Vargas Figueroa | jairovargasfigueroa | Parte 2 · Análisis y métricas (PRs 2.1–2.3, 3.3) |
 
    Si no coincide con nadie, o si Git no tiene su identidad configurada, **pregúntale quién es** y ayúdale a configurar `user.name` y `user.email` con su propia cuenta antes de seguir.
 2. **Trae lo último:** `git fetch origin` y `git switch main && git pull` (si hay cambios sin commitear en otra rama, primero haz commit o pregunta).

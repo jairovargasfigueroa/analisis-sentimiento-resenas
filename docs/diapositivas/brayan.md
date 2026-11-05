@@ -1,6 +1,6 @@
 # Diapositivas · Parte de Brayan (problema, datos, NLP y demo)
 
-Guion y contenido de cada diapositiva. Se unen con las de Jairo (modelos, métricas, errores y conclusiones) en `docs/presentacion.pdf`. Tiempo total de esta parte: ~5 minutos.
+Guion y contenido de cada diapositiva. Se unen con las de Jairo (6 a 11: EDA, modelos, métricas, errores y conclusiones) en `docs/presentacion.pdf`. Tiempo total de esta parte: ~5 minutos.
 
 ---
 
@@ -16,7 +16,7 @@ Guion y contenido de cada diapositiva. Se unen con las de Jairo (modelos, métri
 
 ---
 
-## 2 · Datos
+## 2 · Datos y formato del corpus
 
 **The Spanish Fake News Corpus** · CC BY 4.0 · etiquetado a mano
 
@@ -29,10 +29,6 @@ Guion y contenido de cada diapositiva. Se unen con las de Jairo (modelos, métri
 - Split estratificado 80/20 con SEED = 42 → 1.233 / 309.
 - La **fuente no entra al modelo**: hay sitios satíricos que solo publican falsas.
 
----
-
-## 3 · Lo que encontramos en los datos
-
 **Las dos versiones no tienen el mismo formato.**
 
 - v1 repite el titular dentro del cuerpo (943 de 971).
@@ -42,7 +38,7 @@ Guion y contenido de cada diapositiva. Se unen con las de Jairo (modelos, métri
 
 ---
 
-## 4 · Pipeline de NLP
+## 3 · Pipeline de NLP
 
 ```
 normalizar → tokenizar → stop words → lematizar → quitar tildes → TF-IDF → modelo
@@ -57,7 +53,7 @@ normalizar → tokenizar → stop words → lematizar → quitar tildes → TF-I
 
 ---
 
-## 5 · La decisión que más cuesta explicar: las tildes
+## 4 · La decisión que más cuesta explicar: las tildes
 
 | Palabra | Lema |
 |---|---|
@@ -65,14 +61,14 @@ normalizar → tokenizar → stop words → lematizar → quitar tildes → TF-I
 | afirmo (sin tilde) | **afirmoir** ✗ |
 
 - spaCy necesita las tildes → se lematiza **antes** de quitarlas.
-- Lema contra stemming: 0,786 contra 0,770 de F1. Snowball une «murieron» y «muro» en `mur`.
+- Snowball une «murieron» y «muro» en `mur`. Con validación cruzada, lema y stem empatan (E1, diapositiva 8); queda lema por estabilidad y legibilidad.
 
 ---
 
-## 6 · Demo en vivo
+## 5 · Demo en vivo
 
 1. Mostrar la cabecera: **punto verde** (`/health`).
-2. Botón **«Falsa 2021»** → *Parece falsa · 67 %*.
+2. Botón **«Falsa 2021»** → *Parece falsa* (~90 % con el modelo final).
 3. Bajar al **paso a paso**: stop words tachadas, lemas, entrada a TF-IDF.
 4. Borrar texto hasta dejar menos de 20 palabras → el botón se desactiva; por `curl`, la API responde `TEXTO_DEMASIADO_CORTO`.
 5. Pasar a Jairo: pestaña **Métricas**.

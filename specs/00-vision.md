@@ -39,6 +39,6 @@ Una aplicación web, **Detector de Noticias Falsas**, en la que el usuario:
 | Integrante | Usuario GitHub | Parte | Specs |
 |---|---|---|---|
 | Brayan Albaro Garcia Taboada | @Alba-Tab | Parte 1 · Predicción: datos, pipeline de NLP, modelo base, API de predicción, pestaña Analizar | 10 (carga), 20, 30 (base), 40, 50 (Analizar) |
-| Jairo Vargas Figueroa | @jairovargasfigueroa | Parte 2 · Análisis y métricas: EDA, Naive Bayes, GridSearchCV, experimentos, errores, `/metrics` y pestaña Métricas | 10 (EDA), 30 (comparación), 40 (`/metrics`), 50 (Métricas) |
+| Jairo Moises Vargas Figueroa | @jairovargasfigueroa | Parte 2 · Análisis y métricas: EDA, Naive Bayes, GridSearchCV, experimentos, errores, `/metrics` y pestaña Métricas | 10 (EDA), 30 (comparación), 40 (`/metrics`), 50 (Métricas) |
 
 Los dos participan en `60-entrega.md`. **Cada integrante tiene commits de NLP y de ML**, porque el docente preguntará a ambos sobre ello.
