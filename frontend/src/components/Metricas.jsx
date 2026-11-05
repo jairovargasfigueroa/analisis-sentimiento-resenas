@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { metricas as pedirMetricas } from "../api.js";
 import { nombre } from "../formato.js";
 import ComparacionModelos from "./ComparacionModelos.jsx";
+import MatrizConfusion from "./MatrizConfusion.jsx";
 
 // Pestaña Métricas: pide GET /metrics una vez y reparte metricas.json (contrato C6)
 // entre componentes que solo muestran. No calcula métricas: vienen del entrenamiento.
@@ -28,6 +29,7 @@ export default function Metricas() {
         </small>
       </section>
       <ComparacionModelos modelos={datos.modelos} produccion={modelo_produccion} />
+      <MatrizConfusion modelo={datos.modelos[modelo_produccion]} clave={modelo_produccion} />
     </>
   );
 }

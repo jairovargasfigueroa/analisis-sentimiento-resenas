@@ -114,3 +114,10 @@ button.ejemplo {
 .barra-fila .barra div { background: var(--tachado); }
 .barra-fila .barra div.prod { background: var(--acento); }
 .barra-fila span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.matriz { border-collapse: separate; border-spacing: 4px; font-variant-numeric: tabular-nums; }
+.matriz th { font-size: 13px; color: var(--texto-suave); font-weight: 600; padding: 4px 8px; text-align: left; }
+.matriz td { width: 140px; height: 64px; text-align: center; border-radius: 8px; }
+.matriz td strong { display: block; font-size: 20px; }
+.matriz td small { color: var(--texto-suave); }
+.matriz td.acierto { background: color-mix(in srgb, var(--verdadera) calc(var(--intensidad) * 45%), var(--superficie)); }
+.matriz td.fallo { background: color-mix(in srgb, var(--falsa) calc(var(--intensidad) * 45%), var(--superficie)); }
