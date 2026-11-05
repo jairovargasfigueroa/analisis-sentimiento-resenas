@@ -22,8 +22,10 @@ nlp:
   conservar: ["no", ni, nunca, sin, tampoco]
   # Palabras del dominio que se AGREGAN como stop words (se completan según la EDA).
   agregar: []
+  modo: lema               # modelo de producción: lema | stem | ninguno (E1 los compara)
 
 tfidf:
+  ngram_range: [1, 2]      # modelo de producción (E2 compara [1,1] y [1,2])
   max_features: 20000      # tamaño máximo del vocabulario
   min_df: 2                # ignora términos en menos de 2 noticias
   max_df: 0.90             # ignora términos en más del 90 % de las noticias
