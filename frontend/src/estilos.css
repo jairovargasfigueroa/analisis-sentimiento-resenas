@@ -121,3 +121,17 @@ button.ejemplo {
 .matriz td small { color: var(--texto-suave); }
 .matriz td.acierto { background: color-mix(in srgb, var(--verdadera) calc(var(--intensidad) * 45%), var(--superficie)); }
 .matriz td.fallo { background: color-mix(in srgb, var(--falsa) calc(var(--intensidad) * 45%), var(--superficie)); }
+.experimento + .experimento { margin-top: 8px; }
+.experimento p { margin: 0; }
+code { background: var(--chip); border-radius: 4px; padding: 0 4px; font-size: 12px; text-transform: none; letter-spacing: 0; }
+.columnas { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.barra-fila.corta { grid-template-columns: 110px 1fr 40px; font-size: 13px; }
+.barra-fila .barra div.falsa { background: var(--falsa); }
+.barra-fila .barra div.verdadera { background: var(--verdadera); }
+.error-item { border-top: 1px solid var(--borde); padding: 10px 0; }
+.error-item:first-child { border-top: 0; padding-top: 0; }
+.error-item p { margin: 6px 0 0; font-size: 14px; white-space: pre-line; }
+.error-item .fila { margin-top: 0; }
+.etiqueta { font-size: 12px; font-weight: 600; border-radius: 999px; padding: 1px 8px; }
+.etiqueta.falsa { background: var(--falsa-suave); color: var(--falsa); }
+.etiqueta.verdadera { background: var(--verdadera-suave); color: var(--verdadera); }
