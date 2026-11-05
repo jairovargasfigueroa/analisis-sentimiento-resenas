@@ -11,12 +11,10 @@ Haz esto tú mismo, sin esperar a que el integrante lo pida:
 
 1. **Identifica al integrante** con `git config user.name`, `git config user.email` y, si está disponible, `gh api user --jq .login`. Búscalo en esta tabla:
 
-   | Integrante | Usuario GitHub | Rol |
+   | Integrante | Usuario GitHub | Parte |
    |---|---|---|
-   | P1 · Jairo Vargas Figueroa | jairovargasfigueroa | Datos y NLP |
-   | P2 · Brayan Albaro Garcia Taboada | Alba-Tab | Modelado |
-   | P3 · Jovas Josue | JOVAS45 | Backend |
-   | P4 · Adrian Rosales | black7in | Frontend |
+   | Brayan Albaro Garcia Taboada | Alba-Tab | Parte 1 · Predicción (PRs 1.0–1.6, 3.1, 3.2) |
+   | Jairo Vargas Figueroa | jairovargasfigueroa | Parte 2 · Análisis y métricas (PRs 2.1–2.3, 3.3) |
 
    Si no coincide con nadie, o si Git no tiene su identidad configurada, **pregúntale quién es** y ayúdale a configurar `user.name` y `user.email` con su propia cuenta antes de seguir.
 2. **Trae lo último:** `git fetch origin` y `git switch main && git pull` (si hay cambios sin commitear en otra rama, primero haz commit o pregunta).
@@ -28,22 +26,22 @@ Haz esto tú mismo, sin esperar a que el integrante lo pida:
    gh pr list                                     # PR abiertos (en revisión)
    ```
    Si `gh` no está instalado o no tiene sesión, ayúdale a instalarlo y a ejecutar `gh auth login`. Mientras tanto, usa `git log origin/main --merges --oneline` y compara las ramas integradas con las del plan.
-4. **Elige la siguiente tarea de ESE integrante**, siguiendo el orden de su fila en "Resumen por persona" del plan:
+4. **Elige la siguiente tarea de ESE integrante**, siguiendo el orden de su parte en `specs/04-plan-de-trabajo.md`:
    - Si tiene una rama de una tarea a medias (`git branch`, o un PR abierto suyo), continúa esa.
    - Si no, toma su primer issue abierto en ese orden.
    - Mira la sección "Depende de" del issue: si alguno sigue **abierto**, no esperes; trabaja con el contrato de `02-contratos.md` y datos simulados, o adelanta su siguiente tarea que no dependa de nada.
    - Si le toca revisar un PR de un compañero (`gh pr list --search "review-requested:@me"`), díselo primero: revisar desbloquea al equipo.
 5. **Díselo al integrante** en dos o tres líneas, antes de tocar código: quién es, qué tareas suyas ya están cerradas, cuál toca ahora (issue, rama y spec) y de qué depende. Espera su confirmación.
-6. Crea la rama de esa tarea desde `main` actualizado, con **el nombre exacto que dice el issue**.
+6. Crea la rama de esa tarea con **el nombre exacto que dice el issue**, desde la rama que indica (los PRs de la Parte 1 van encadenados: cada rama sale de la anterior; los de la Parte 2 salen de `main` actualizado).
 
 ## Al terminar una tarea
 
 1. Corre `pytest -q` (si hay tests) y verifica los criterios de aceptación de la spec.
-2. Actualiza la rama con `main` (`git merge origin/main`) y resuelve conflictos si los hay.
+2. Actualiza la rama con su base (`git merge origin/main`, o la rama anterior si es un PR encadenado) y resuelve conflictos si los hay.
 3. `git push -u origin <rama>` y abre el PR:
    - Título **`[<número de tarea>] tipo(ámbito): descripción`**, por ejemplo `[1.3] feat(nlp): stop words con negaciones conservadas`. La CI rechaza otro formato.
    - En la descripción, **`Closes #<issue>`**: así el issue se cierra solo al integrar.
-   - Pide la revisión al compañero que indica la tabla "Orden de revisión" del plan: `gh pr create --reviewer <usuario>`.
+   - Apunta a la base correcta y pide la revisión al otro integrante: `gh pr create --base <rama> --reviewer <usuario>`.
 4. Espera a que la CI (tests y build) quede en verde. Si falla, corrígelo en la misma rama.
 5. Dile al integrante qué tarea sigue.
 

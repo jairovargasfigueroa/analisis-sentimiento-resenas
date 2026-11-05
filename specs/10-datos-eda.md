@@ -1,74 +1,66 @@
 # 10 · Datos y análisis exploratorio
 
-- **Responsable:** Integrante 1 (Jairo)
-- **Ramas sugeridas:** `feat/datos-carga`, `exp/eda`
-- **Archivos:** `src/data/cargar.py`, `data/`, `notebooks/01_eda.ipynb`, secciones `data`, `labels` y `nlp` de `params.yaml`
+- **Responsables:** Brayan (carga, PR 1.1) y Jairo (EDA, PR 2.1)
+- **Ramas:** `feat/datos-carga`, `exp/eda`
+- **Archivos:** `src/data/cargar.py`, `data/`, `notebooks/01_eda.ipynb`, secciones `data`, `labels` y `nlp.agregar` de `params.yaml`
 - **Enunciado:** sección 4 (reglas del dataset) y sección 5.1
 
 ## Objetivo
 
-Conseguir un dataset de reseñas en español, documentarlo, dejarlo limpio con el formato C2 y hacer la EDA que pide el docente.
+Dejar el corpus de noticias limpio con el formato C2 y hacer la EDA que pide el docente.
 
-## Elección del dataset
+## Dataset elegido
 
-Criterios:
+**The Spanish Fake News Corpus** (versiones 1 y 2; la segunda fue la base de FakeDeS en IberLEF 2021). Datos **reales**, en **español**, etiquetados a mano, licencia **CC BY 4.0**. Se descarga del GitHub de los autores, sin registro.
 
-- **Datos reales**, no sintéticos (el ejemplo del docente usa sintéticos y él aclara que los grupos deben usar reales).
-- En **español**.
-- **Al menos 1.000 reseñas** etiquetadas, o con estrellas. Lo ideal es tener entre 3.000 y 20.000 para que entrene rápido.
-- Licencia que permita uso académico.
-- Que se pueda descargar sin pasos manuales complicados.
+| Archivo | Período | Noticias | Verdaderas / falsas | Temas principales |
+|---|---|---|---|---|
+| `train.xlsx` + `development.xlsx` (v1) | ene–jul 2018 | 971 | 491 / 480 | Política, Entretenimiento, Sociedad, Deporte, Ciencia |
+| `test.xlsx` (v2) | nov 2020–mar 2021 | 572 | 286 / 286 | COVID-19, Sociedad, Política |
 
-Candidatos (**verificar disponibilidad y licencia** antes de elegir):
+Columnas originales: `Id`, `Category`, `Topic`, `Source`, `Headline`, `Text`, `Link`. Mediana de unas 315 palabras en v1 y 400 en v2 (máximo 2.566). Incluye fuentes de varios países de habla hispana, también Bolivia.
 
-- Reseñas de restaurantes u hoteles en español (Kaggle o Hugging Face Datasets, buscar "spanish reviews", "reseñas tripadvisor español").
-- Reseñas de películas en español con puntuación (por ejemplo, el corpus *muchocine*).
-- Reseñas de productos en español con estrellas.
+Documentar en `data/raw/README.md`: **nombre, URL, licencia, fecha de obtención, número de registros y columnas originales**.
 
-Documentar en `data/README.md`: **nombre, URL, licencia, fecha de descarga, número de registros y columnas originales**.
-
-Si el archivo pesa más de 50 MB, no se sube: en su lugar se crea `src/data/descargar.py`, que lo descarga.
-
-## Etiquetado
-
-Si el dataset trae estrellas de 1 a 5:
-
-- 1–2 → `negativo`
-- 4–5 → `positivo`
-- 3 → **se descarta** (es ambiguo). Hay que justificarlo en el informe.
-
-## Limpieza (`src/data/cargar.py`)
+## Carga y unificación (`src/data/cargar.py`)
 
 ```python
-def cargar_crudo() -> pd.DataFrame: ...          # lee data/raw
+def cargar_crudo() -> pd.DataFrame: ...          # lee los tres .xlsx de data/raw
 def limpiar_y_etiquetar(df) -> pd.DataFrame: ...  # devuelve columnas C2
-def cargar_procesado() -> pd.DataFrame: ...       # lee data/processed/resenas.csv
+def cargar_procesado() -> pd.DataFrame: ...       # lee data/processed/noticias.csv
 ```
 
-- Eliminar filas con texto nulo o vacío, y **duplicados exactos**. Reportar cuántas se eliminaron.
-- Guardar el resultado en `data/processed/resenas.csv` (C2).
+Cuidados (si no se hacen, las métricas salen absurdas):
 
-## EDA (`notebooks/01_eda.ipynb`)
+- La v2 trae los encabezados en mayúsculas (`CATEGORY`, `TOPICS`, …): se unifican los nombres de columna.
+- La etiqueta falsa viene como `Fake` en v1 y como `False` en v2. Se mapea a `falsa` / `verdadera` (`True` → `verdadera`).
+- `texto = Headline + ". " + Text`. Algunas noticias de la v2 no tienen titular: en ese caso, solo `Text`.
+- `anio`: 2018 para v1; para v2 el año de la noticia (2020 o 2021) si se puede, si no 2021.
+- La columna `Source` se guarda como `fuente`, pero **no entra al modelo**: hay sitios satíricos (El Dizque, El Ruinaversal) que solo aparecen como falsos. Usarla sería hacer trampa.
+- Eliminar filas con texto vacío y **duplicados exactos**. Reportar cuántas se eliminaron.
+
+## Split
+
+Se juntan las 1.543 noticias y `train.py` hace `train_test_split(test_size=TEST_SIZE, stratify=y, random_state=SEED)`. El conjunto de prueba **no se usa para ajustar nada**.
+
+Experimento extra (E3, opcional): entrenar con 2018 y probar con 2020–21, para medir la generalización en el tiempo. No se usa para elegir nada.
+
+## EDA (`notebooks/01_eda.ipynb`, Jairo)
 
 Debe mostrar, con gráficos y una conclusión escrita en cada caso:
 
 - [ ] Número de registros antes y después de limpiar.
-- [ ] **Valores faltantes** por columna.
-- [ ] **Distribución de clases** (barras) y, si hay estrellas, distribución de estrellas.
-- [ ] **Longitud de los textos** (en palabras y en caracteres): histograma por clase y percentiles. Esto justifica `LONGITUD_MAX_TEXTO`.
-- [ ] **Palabras más frecuentes** por clase, con y sin stop words (barras o nube de palabras).
-- [ ] Conclusión sobre el **desbalance**: si la clase minoritaria es menor al 40 %, proponer un tratamiento (`class_weight="balanced"` o submuestreo) y avisar a P2.
-- [ ] Ejemplos de textos difíciles: ironía, negaciones, emojis, URLs, faltas de ortografía. Estos sirven de insumo para la spec 20.
-
-## Split
-
-El split lo **hace `train.py` (P2)**, no la EDA, para que sea reproducible. Se usa `train_test_split(test_size=TEST_SIZE, stratify=y, random_state=SEED)`.
-
-El conjunto de prueba **no se usa para ajustar nada**.
+- [ ] **Faltantes** por columna (titulares vacíos de la v2).
+- [ ] **Distribución de clases** (barras): confirma que no hace falta `class_weight`.
+- [ ] **Longitud de los textos** (palabras y caracteres): histograma por clase y percentiles. Justifica `max_chars` y `min_palabras`.
+- [ ] **Palabras más frecuentes** por clase, con y sin stop words. Las que aparecen igual en ambas clases van a `nlp.agregar`.
+- [ ] **Temas por clase** y por versión del corpus.
+- [ ] **Exclamaciones** por clase: comprueba si el token `exclamacion` tiene sentido.
+- [ ] **Hallazgo de las fuentes satíricas**: fuentes que solo publican falsas.
 
 ## Criterios de aceptación
 
-- [ ] `data/README.md` con origen, licencia, fecha y tamaño.
-- [ ] `data/processed/resenas.csv` cumple C2 y tiene al menos 1.000 filas.
+- [ ] `data/raw/README.md` con origen, licencia, fecha y tamaño.
+- [ ] `data/processed/noticias.csv` cumple C2 y tiene 1.543 filas (menos los duplicados reportados).
 - [ ] `python -c "from src.data.cargar import cargar_procesado; print(cargar_procesado().shape)"` funciona.
 - [ ] El notebook de EDA se ejecuta de principio a fin sin errores y tiene conclusiones escritas.

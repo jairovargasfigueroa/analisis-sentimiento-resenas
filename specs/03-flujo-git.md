@@ -18,13 +18,17 @@ Instala también **GitHub CLI** (`winget install GitHub.cli`) e inicia sesión c
 ## Ramas
 
 - `main` está **protegida**: nadie hace push directo, todo entra por pull request.
-- Se crea **una rama por funcionalidad**, a partir de `main` actualizado:
+- Se crea **una rama por funcionalidad**. Los PRs de la Parte 1 (Brayan) van **encadenados**: cada rama sale de la anterior y su PR apunta a esa rama, así cada uno muestra solo su cambio. Cuando se integra uno y se borra su rama, GitHub mueve el siguiente a `main` solo. Los de Jairo salen de `main` ya actualizado.
 
 ```bash
-git switch main
-git pull
-git switch -c feat/nlp-normalizacion
+git switch feat/datos-carga          # la rama anterior (o main si es la primera)
+git switch -c feat/nlp-pipeline
+# ... commits ...
+git push -u origin feat/nlp-pipeline
+gh pr create --base feat/datos-carga --title "[1.2] feat(nlp): pipeline de preprocesamiento completo"
 ```
+
+- Se revisa e integra **siempre desde el PR de más abajo** de la cadena.
 
 Formato del nombre: `tipo/area-descripcion-corta`. Ejemplos: `feat/nlp-stopwords`, `feat/modelos-gridsearch`, `feat/api-predict`, `feat/front-panel-metricas`, `docs/informe-nlp`, `fix/api-cors`.
 
@@ -37,8 +41,8 @@ Se usa **Conventional Commits**: `tipo(ámbito): qué se hizo`, y en el cuerpo, 
 ```
 feat(nlp): conservar "no", "ni", "nunca" y "sin" al quitar stop words
 
-En análisis de sentimiento la negación invierte el significado:
-"no me gustó" sin el "no" se vuelve positivo.
+La negación invierte lo que afirma la noticia:
+"no hay vacuna" y "hay vacuna" dicen cosas opuestas.
 ```
 
 | tipo | uso |
@@ -61,10 +65,10 @@ Reglas:
 ## Pull requests
 
 1. Sube tu rama: `git push -u origin feat/nlp-normalizacion`.
-2. Abre el PR hacia `main` (`gh pr create` o desde la web). Completa la plantilla.
-3. Pide revisión a **otro integrante**, idealmente el que va a consumir tu código.
+2. Abre el PR hacia `main`, o hacia la rama anterior si es un PR encadenado (`gh pr create --base <rama>`). Completa la plantilla.
+3. Pide revisión al **otro integrante**.
 4. El revisor lee el código, lo prueba y **aprueba** o pide cambios con comentarios concretos.
-5. Quien abrió el PR lo integra con **"Create a merge commit"**. No uses "Squash and merge", porque mantener los commits individuales preserva la autoría.
+5. El revisor lo integra con **"Create a merge commit"**. No uses "Squash and merge", porque mantener los commits individuales preserva la autoría.
 6. Borra la rama después del merge.
 
 Si `main` avanzó mientras trabajabas:
@@ -82,14 +86,12 @@ git merge main      # NO rebase sobre ramas compartidas
 - Commits con la cuenta o el nombre de otra persona.
 - Cuentas compartidas.
 
-## Orden sugerido de integración
+## Orden de integración
 
 ```
-P1: config + cargar datos ─┐
-P1: normalizar/tokenizar/stopwords ─┬─► P1: TextPreprocessor ─► P2: train.py ─► P3: API con modelo real ─► P4: frontend con API real
-P2: stemizar/lematizar ─────────────┘
-P3: API con modelo de prueba (mock) ──────────────────────────────────────────┘
-P4: frontend con JSON mock (C8) ──────────────────────────────────────────────────────────────────────────┘
+Parte 1 (Brayan): 1.0 → 1.1 → 1.2 → 1.3 → 1.4 → 1.5 → 1.6   (encadenados; los integra Jairo de abajo hacia arriba)
+Parte 2 (Jairo):  2.1, 2.2 → 2.3                            (salen de main; los integra Brayan)
+Cierre:           3.1 (opcional), 3.2, 3.3 → tag entrega-final
 ```
 
 Nadie tiene que esperar: con los contratos de `02-contratos.md`, cada uno empieza con datos simulados y conecta lo real cuando está en `main`.

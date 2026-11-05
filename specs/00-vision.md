@@ -2,46 +2,43 @@
 
 ## Problema
 
-Restaurantes, hoteles y tiendas reciben muchas reseñas en español y no pueden leerlas todas.
-Necesitan saber rápidamente si una reseña es **positiva o negativa**, y con qué seguridad.
+Circulan muchas noticias falsas en español por medios digitales, Facebook y WhatsApp, y verificar cada una a mano lleva tiempo.
+Hace falta una primera señal rápida: ¿esta noticia parece **falsa o verdadera**, y con qué seguridad?
 
 ## Solución
 
-Una aplicación web, **Analizador de Sentimiento de Reseñas**, en la que el usuario:
+Una aplicación web, **Detector de Noticias Falsas**, en la que el usuario:
 
-1. Escribe una reseña, o sube un archivo con varias.
-2. Ve si es **positiva o negativa**, con su **probabilidad**.
+1. Pega una noticia, o sube un archivo con varias.
+2. Ve si parece **falsa o verdadera**, con su **probabilidad**.
 3. Ve **paso a paso** cómo se preprocesó el texto: normalizado, tokens, stop words eliminadas y lemas o raíces.
 4. Consulta un **panel de métricas** que compara los dos modelos entrenados.
 
 ## Tarea de ML
 
-- **Tipo:** clasificación binaria de texto (`positivo` / `negativo`).
+- **Tipo:** clasificación binaria de texto (`falsa` / `verdadera`).
 - **Modelos (dos, como permite el enunciado):**
-  - **Regresión Logística**: lineal, da probabilidades calibradas y sus coeficientes son interpretables (qué palabras empujan a cada clase).
+  - **Regresión Logística**: lineal, da probabilidades y sus coeficientes son interpretables (qué palabras empujan a cada clase). Candidata a producción.
   - **Naive Bayes Multinomial**: el clásico para texto con TF-IDF o conteos; muy rápido y sirve de buen punto de comparación.
 - Se comparan, se elige uno para producción y se justifica. También se reporta una **línea base** (predecir siempre la clase mayoritaria).
 
 ## Dataset
 
-Lo define `specs/10-datos-eda.md`. Requisitos:
-
-- Reseñas **en español**, con al menos **1.000 registros etiquetados** o con puntuación de estrellas convertible a etiqueta.
-- Se documentan su origen, licencia y fecha de obtención.
+**The Spanish Fake News Corpus** (versiones 1 y 2; la segunda fue la base de FakeDeS en IberLEF 2021): 1.543 noticias reales, etiquetadas a mano y casi balanceadas (777 verdaderas, 766 falsas), con licencia CC BY 4.0. El detalle está en `specs/10-datos-eda.md`.
 
 ## Alcance
 
 **Incluye:** las cinco capas obligatorias (datos, pipeline de NLP, modelos, backend y frontend), un pipeline reproducible, tests, la documentación y la defensa.
 
-**No incluye:** clase neutral (se descartan las reseñas de 3 estrellas, ver spec 10), modelos de deep learning ni autenticación de usuarios. Docker es opcional y queda para el final si sobra tiempo.
+**No incluye:** verificar hechos contra fuentes externas (el modelo solo mira el texto), modelos de deep learning, historial con base de datos ni autenticación de usuarios. Docker es opcional y queda para el final si sobra tiempo.
+
+**Limitación conocida:** un clasificador de texto aprende el **estilo** (sátira, sensacionalismo), no la veracidad. Se dice en el informe y se muestra en el análisis de errores.
 
 ## Equipo
 
-| # | Integrante | Usuario GitHub | Área principal | Specs |
-|---|---|---|---|---|
-| 1 | Jairo Vargas Figueroa | @jairovargasfigueroa | Datos, EDA y NLP base | 10, 20 (parte A) |
-| 2 | Brayan Albaro Garcia Taboada | @Alba-Tab | Modelado y experimentos | 20 (parte B), 30 (parte A) |
-| 3 | Jovas Josue | @JOVAS45 | Backend, evaluación y tests | 30 (parte B), 40 |
-| 4 | Adrian Rosales | @black7in | Frontend y explicación del pipeline | 20 (parte C), 50 |
+| Integrante | Usuario GitHub | Parte | Specs |
+|---|---|---|---|
+| Brayan Albaro Garcia Taboada | @Alba-Tab | Parte 1 · Predicción: datos, pipeline de NLP, modelo base, API de predicción, pestaña Analizar | 10 (carga), 20, 30 (base), 40, 50 (Analizar) |
+| Jairo Vargas Figueroa | @jairovargasfigueroa | Parte 2 · Análisis y métricas: EDA, Naive Bayes, GridSearchCV, experimentos, errores, `/metrics` y pestaña Métricas | 10 (EDA), 30 (comparación), 40 (`/metrics`), 50 (Métricas) |
 
-Todos participan en `60-entrega.md`. **Cada integrante tiene asignada al menos una parte de NLP o ML**, porque el docente preguntará a todos sobre ello.
+Los dos participan en `60-entrega.md`. **Cada integrante tiene commits de NLP y de ML**, porque el docente preguntará a ambos sobre ello.
