@@ -5,6 +5,7 @@ Va de data/raw a models/ sin pasos manuales: carga, split, entrena, evalúa y gu
 
 import json
 from datetime import datetime
+from tempfile import TemporaryDirectory
 
 import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -36,15 +37,19 @@ def dividir(df):
     )
 
 
-def construir_pipeline(clf, modo=None, ngram_range=None) -> Pipeline:
-    """prep -> tfidf -> clf, con los valores de params.yaml salvo que se indiquen otros."""
+def construir_pipeline(clf, modo=None, ngram_range=None, memoria=None) -> Pipeline:
+    """prep -> tfidf -> clf, con los valores de params.yaml salvo que se indiquen otros.
+
+    memoria: carpeta donde el Pipeline guarda el resultado de prep y tfidf. En GridSearchCV
+    solo cambia clf, así que cada partición se lematiza una vez y no una por combinación.
+    """
     tfidf = dict(PARAMS["tfidf"])
     tfidf["ngram_range"] = tuple(ngram_range or tfidf["ngram_range"])
     return Pipeline([
         ("prep", TextPreprocessor(modo=modo or PARAMS["nlp"]["modo"])),
         ("tfidf", TfidfVectorizer(**tfidf)),
         ("clf", clf),
-    ])
+    ], memory=memoria)
 
 
 def entrenar():
@@ -57,10 +62,15 @@ def entrenar():
 
     resultados = {"baseline": evaluar_baseline(X_train, y_train, X_test, y_test)}
     modelos = {}
-    for nombre, clf in CLASIFICADORES.items():
-        busqueda = buscar_hiperparametros(construir_pipeline(clf), nombre, X_train, y_train)
-        modelos[nombre] = busqueda.best_estimator_
-        resultados[nombre] = {**evaluar(modelos[nombre], X_test, y_test), **resumen_cv(busqueda)}
+    # Caché temporal compartida por los dos modelos: usan el mismo prep y tfidf.
+    with TemporaryDirectory() as memoria:
+        for nombre, clf in CLASIFICADORES.items():
+            pipeline = construir_pipeline(clf, memoria=memoria)
+            busqueda = buscar_hiperparametros(pipeline, nombre, X_train, y_train)
+            # Sin memoria antes de guardarlo: la carpeta temporal deja de existir al salir.
+            modelos[nombre] = busqueda.best_estimator_.set_params(memory=None)
+            resultados[nombre] = {**evaluar(modelos[nombre], X_test, y_test),
+                                  **resumen_cv(busqueda)}
     return modelos, resultados, (df, X_train, X_test)
 
 
