@@ -42,8 +42,8 @@ Requisitos: **Python 3.12**, **Node 18 o superior** y Git. Todos los comandos se
 ### 1. Clonar
 
 ```bash
-git clone https://github.com/jairovargasfigueroa/analisis-sentimiento-resenas.git
-cd analisis-sentimiento-resenas
+git clone https://github.com/jairovargasfigueroa/detector-noticias-falsas.git
+cd detector-noticias-falsas
 ```
 
 ### 2. Entorno de Python

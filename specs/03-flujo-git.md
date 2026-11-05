@@ -7,8 +7,8 @@ El docente evalúa la contribución individual **a partir del historial de commi
 ```bash
 git config --global user.name "Tu Nombre Apellido"
 git config --global user.email "el-correo-de-tu-cuenta-github@ejemplo.com"
-git clone https://github.com/jairovargasfigueroa/analisis-sentimiento-resenas.git
-cd analisis-sentimiento-resenas
+git clone https://github.com/jairovargasfigueroa/detector-noticias-falsas.git
+cd detector-noticias-falsas
 ```
 
 Comprueba que tus commits salgan con tu cuenta: el correo debe ser uno verificado en tu GitHub.
