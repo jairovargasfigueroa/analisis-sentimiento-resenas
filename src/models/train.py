@@ -1,9 +1,11 @@
-"""Entrenamiento: python -m src.models.train (spec 30, contrato C6).
+"""Entrenamiento: python -m src.models.train [--rapido] (spec 30, contrato C6).
 
 Va de data/raw a models/ sin pasos manuales: carga, split, entrena, evalúa y guarda.
+Completo tarda unos 80 s; --rapido (~45 s) salta los experimentos E1, E2 y E3.
 """
 
 import json
+import sys
 from datetime import datetime
 from tempfile import TemporaryDirectory
 
@@ -53,12 +55,21 @@ def construir_pipeline(clf, modo=None, ngram_range=None, memoria=None) -> Pipeli
     ], memory=memoria)
 
 
-def entrenar():
+def experimentos_anteriores() -> dict:
+    """Los experimentos del último metricas.json, para no recalcularlos en el modo rápido."""
+    if not RUTA_METRICAS.exists():
+        return {}
+    return json.loads(RUTA_METRICAS.read_text(encoding="utf-8")).get("experimentos", {})
+
+
+def entrenar(con_experimentos=True):
     """Línea base, GridSearchCV de cada clasificador y experimentos.
 
     Devuelve (modelos, resultados, experimentos, datos).
 
     Los hiperparámetros se eligen con validación cruzada en train; test solo se reporta.
+    con_experimentos=False salta E1, E2 y E3 (los más lentos) y conserva los anteriores: sirve
+    para reentrenar rápido tras cambiar una stop word o un hiperparámetro.
     """
     df = cargar_procesado()
     X_train, X_test, y_train, y_test = dividir(df)
@@ -71,7 +82,8 @@ def entrenar():
             pipeline = construir_pipeline(clf, memoria=memoria)
             busquedas[nombre] = buscar_hiperparametros(pipeline, nombre, X_train, y_train)
         mejor = max(busquedas, key=lambda n: busquedas[n].best_score_)
-        exps = experimentos(busquedas[mejor].best_estimator_, df, X_train, y_train)
+        exps = (experimentos(busquedas[mejor].best_estimator_, df, X_train, y_train)
+                if con_experimentos else experimentos_anteriores())
 
     modelos = {}
     for nombre, busqueda in busquedas.items():
@@ -143,7 +155,11 @@ def guardar(modelos, resultados, exps, datos) -> str:
 
 
 if __name__ == "__main__":
-    modelos, resultados, exps, datos = entrenar()
+    # python -m src.models.train --rapido   -> sin E1, E2 y E3 (para la defensa)
+    rapido = "--rapido" in sys.argv
+    if rapido:
+        print("Modo rápido: sin E1, E2 ni E3; se conservan los experimentos anteriores.")
+    modelos, resultados, exps, datos = entrenar(con_experimentos=not rapido)
     print(f"{'modelo':<22}{'f1_cv':>8}{'accuracy':>10}{'f1_test':>9}  hiperparámetros")
     for nombre, r in resultados.items():
         cv = f"{r['f1_cv_media']:.3f}" if "f1_cv_media" in r else "-"
