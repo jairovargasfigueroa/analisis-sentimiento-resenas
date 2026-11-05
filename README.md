@@ -74,12 +74,15 @@ python -m nltk.downloader stopwords
 python -m src.models.train
 ```
 
-Genera `data/processed/noticias.csv`, entrena y guarda `models/modelo_produccion.joblib` y `models/metricas.json`. Tarda menos de un minuto e imprime una tabla como esta:
+Genera `data/processed/noticias.csv`, busca los hiperparámetros de los dos modelos con validación cruzada, elige el mejor, corre los experimentos E1, E2 y E3 y guarda `models/modelo_produccion.joblib` y `models/metricas.json`. Tarda unos 80 s (`--rapido`, sin experimentos, unos 45 s) e imprime una tabla como esta:
 
-| modelo | accuracy | F1 macro |
-|---|---|---|
-| línea base (clase mayoritaria) | 0,505 | 0,336 |
-| Regresión Logística | 0,786 | 0,786 |
+| modelo | F1 CV | accuracy | F1 test | hiperparámetros |
+|---|---|---|---|---|
+| línea base (clase mayoritaria) | — | 0,505 | 0,336 | — |
+| Regresión Logística ★ | 0,766 | 0,773 | 0,773 | C = 10 |
+| Naive Bayes | 0,695 | 0,735 | 0,732 | alpha = 0,1 |
+
+El repo ya trae el modelo entrenado en `models/`, así que este paso solo hace falta si se cambia algo.
 
 ### 4. Levantar la API
 
@@ -97,7 +100,11 @@ npm install
 npm run dev
 ```
 
-Abre <http://localhost:5173>. La cabecera muestra un punto verde si la API y el modelo están listos. Prueba con los botones de ejemplo: son noticias del conjunto de prueba, que el modelo no vio al entrenar.
+Abre <http://localhost:5173>. La cabecera muestra un punto verde si la API y el modelo están listos. Tiene tres pestañas:
+
+- **Analizar**: una noticia, su clase y el preprocesamiento paso a paso. Prueba con los botones de ejemplo: son noticias del conjunto de prueba, que el modelo no vio al entrenar.
+- **Lote**: sube un `.csv` (columna `texto`) o un `.txt` (una noticia por línea). Hay un ejemplo descargable en la misma pestaña.
+- **Métricas**: comparación de modelos, matriz de confusión, experimentos, palabras influyentes y errores.
 
 ### 6. Tests
 
@@ -120,14 +127,17 @@ pytest -q
 data/raw/         corpus original (.xlsx) y su README
 src/data/         carga y unificación del corpus
 src/nlp/          normalización, tokens, stop words, lemas y TextPreprocessor
-src/models/       train.py y predecir.py
-api/              FastAPI: /health y /predict
-frontend/         React + Vite: pestaña Analizar con el paso a paso
+src/models/       train.py, experimentos.py, evaluacion.py y predecir.py
+models/           modelo entrenado (.joblib) y metricas.json
+notebooks/        EDA, experimentos y análisis de errores (01_eda.ipynb)
+api/              FastAPI: /health, /predict, /predict/lote y /metrics
+frontend/         React + Vite: pestañas Analizar, Lote y Métricas
 tests/            pytest
+docs/             informe, API, modificaciones en vivo y diapositivas
 params.yaml       todos los parámetros ajustables (stop words, TF-IDF, grillas, límites de la API)
 ```
 
-Cambiar un valor de `params.yaml` y reentrenar alcanza para casi todas las modificaciones en vivo.
+Cambiar un valor de `params.yaml` y reentrenar (`python -m src.models.train --rapido`) alcanza para casi todas las modificaciones en vivo. Las recetas ensayadas están en [`docs/modificaciones_en_vivo.md`](docs/modificaciones_en_vivo.md).
 
 ## Datos
 
