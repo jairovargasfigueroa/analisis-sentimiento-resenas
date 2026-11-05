@@ -166,7 +166,7 @@ TF-IDF produce vectores **dispersos** de hasta 20.000 dimensiones con solo 1.233
 
 `GridSearchCV` con `StratifiedKFold` de 5 particiones barajadas con `SEED = 42`, `scoring="f1_macro"` y solo con el conjunto de entrenamiento. El pipeline completo (`prep → tfidf → clf`) se clona en cada partición, así TF-IDF aprende el vocabulario sin ver la partición de validación. Las grillas salen de `params.yaml → experiments.models`.
 
-Para que la búsqueda no lematice cada partición una vez por combinación, el `Pipeline` usa `memory`: guarda en una carpeta temporal la salida de `prep` y `tfidf`, que no cambian cuando solo cambia el clasificador. Con 200 noticias la búsqueda de los dos modelos bajó de 74 s a 22 s con los mismos resultados; el entrenamiento completo, con los experimentos, tarda unos 7 minutos.
+Para que la búsqueda no lematice cada partición una vez por combinación, el `Pipeline` usa `memory`: guarda en una carpeta temporal la salida de `prep` y `tfidf`, que no cambian cuando solo cambia el clasificador. Con 200 noticias la búsqueda de los dos modelos bajó de 74 s a 22 s con los mismos resultados. Además, `pasos()` memoriza el preprocesamiento de cada noticia (la clave incluye la lista de stop words vigente), porque en la validación cruzada cada noticia aparece en 5 particiones. Con las dos cachés, el entrenamiento completo con los experimentos tarda unos 80 s (antes ~7 minutos), y `python -m src.models.train --rapido`, sin E1, E2 ni E3, unos 45 s: suficiente para una modificación en vivo.
 
 **El modelo de producción se elige por el F1 de validación cruzada, no por el de prueba.** Si se eligiera mirando el test, el test dejaría de ser una medición independiente. Por eso el F1 de prueba bajó de 0,786 (modelo base del PR 1.3, elegido sin CV) a 0,773: no empeoró el modelo, mejoró la honestidad de la medición.
 
@@ -276,19 +276,25 @@ React + Vite, con versiones fijas. Se tomó del ejemplo del docente (Opiniómetr
 
 ## 8. Conclusiones y limitaciones
 
-_(Se completa con Jairo cuando estén los resultados del 2.2.)_
-
-Desde la parte de datos y NLP:
+Desde la parte de datos y NLP (Brayan):
 
 - **El modelo aprende estilo, no veracidad.** Las señales que más ayudan (exclamaciones, tono, temas) son de forma. Una noticia falsa bien escrita o una verdadera alarmista lo engañan.
 - **Las diferencias de formato entre versiones del corpus contaminan el modelo** si no se igualan. Dos de ellas valían un punto de F1.
 - **Pocos datos** (1.542 noticias): por eso modelos lineales y validación cruzada, no modelos más complejos.
 
+Desde la parte de modelos y métricas (Jairo):
+
+- **El modelo funciona y es honesto.** La Regresión Logística llega a F1 0,766 en validación cruzada y 0,773 en prueba, 44 puntos por encima de la línea base. Se eligió sin mirar el test, así que ese 0,773 es una estimación limpia de cómo rinde con noticias nuevas del mismo tipo.
+- **Los atajos estaban en los datos, no en el modelo.** La fuente decide casi sola la etiqueta y las firmas de agencia la filtraban dentro del texto. Un modelo que las usara tendría números mejores y sería inútil con una noticia de una fuente desconocida.
+- **Se degrada con el tiempo** (E3: de 0,766 a 0,643 entrenando con 2018 y probando con 2020-21). En producción habría que reentrenarlo periódicamente con noticias nuevas.
+- **Falla cuando el estilo engaña:** falsas bien redactadas que citan medios o autoridades, y verdaderas sobre temas que en el corpus abundan en bulos. Es una primera señal para priorizar qué verificar, no un verificador.
+- **Trabajo futuro:** más datos y más recientes, ajustar el umbral de decisión (el AUC de 0,835 indica que el modelo ordena mejor de lo que sugiere su accuracy) y contrastar las afirmaciones con fuentes externas.
+
 ## 9. Declaración de uso de asistentes de IA
 
 **Brayan:** usé Claude (Anthropic), a través de Claude Code, como asistente durante todo el desarrollo de la Parte 1 (datos, pipeline de NLP, modelo base, API, frontend y README) y de esta documentación. Me ayudó a redactar código, tests, specs, mensajes de commit y estos textos, y a revisar el corpus. Por ejemplo, señaló el titular repetido y los marcadores `*NUMBER*` de la v1. Revisé cada cambio, corrí los tests y ensayé las modificaciones en vivo con los números que figuran en `docs/modificaciones_en_vivo.md`. Las decisiones de diseño y su justificación están en este informe y en los mensajes de commit, y puedo explicarlas.
 
-**Jairo:** _(PR 3.3.)_
+**Jairo:** usé Claude (Anthropic), a través de Claude Code, como asistente en la organización del repositorio (specs, reglas para agentes, issues y CI), en la revisión de los PRs de Brayan y en toda la Parte 2: el notebook de EDA y experimentos, `evaluacion.py`, `experimentos.py`, los cambios de `train.py`, el endpoint `/metrics`, la pestaña Métricas, esta documentación y los mensajes de commit. Revisé cada cambio, corrí los tests y el entrenamiento, comprobé en el navegador la pestaña Métricas contra la API real, y los números de este informe y de las recetas J1 a J3 salen de ejecuciones reales. Las decisiones y su justificación están en el informe y en los commits, y puedo explicarlas y modificarlas.
 
 ## 10. Referencias
 
